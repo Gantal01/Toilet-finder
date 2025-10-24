@@ -7,7 +7,7 @@ declare module 'leaflet'{
     }
 
     interface MarkerClusterGroupOptions{
-        iconCreate?:(cluster: MarkerCluster) => L.Icon | L.DivIcon;
+        iconCreateFunction?:(cluster: MarkerCluster) => L.Icon | L.DivIcon;
     }
 
     function markerClusterGroup(options:MarkerClusterGroupOptions): L.MarkerClusterGroup; 

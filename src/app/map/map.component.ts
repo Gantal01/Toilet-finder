@@ -26,14 +26,14 @@ export class MapComponent implements AfterViewInit{
       this.initMap();
 
       const markers = L.markerClusterGroup({
-          iconCreate: function (cluster) {
+          iconCreateFunction: function (cluster) {
             const count = cluster.getChildCount(); 
             return L.divIcon({
               html: `
                 <div style="
                   position: relative;
-                  width: 30px;
-                  height: 30px;
+                  width: 60px;
+                  height: 60px;
                   background-image: url('assets/toilet_marker.png');
                   background-size: cover;
                   background-repeat: no-repeat;
@@ -68,31 +68,24 @@ export class MapComponent implements AfterViewInit{
         });
 
 
-      this.api.getToilets().subscribe({
-        next: (toilets) => {
-          toilets.forEach((t: any) => {
-            if(t.lat && t.lon){
-              const marker = L.marker([t.lat, t.lon], {
-                icon: L.icon({
-                  iconUrl:'assets/toilet_marker.png',
-                  iconSize: [25, 25],
-                })
-              });
-              marker.addTo(this.map);
-            }
-          });
+  this.api.getToilets().subscribe({
+    next: (toilets) => {
+      const toiletIcon = L.icon({
+        iconUrl: 'assets/toilet_marker.png',
+        iconSize: [60, 60],
+      });
+
+      toilets.forEach((t: any) => {
+        if (t.lat && t.lon) {
+          const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
+          markers.addLayer(marker);
         }
       });
 
-
-
-
-
-
-    
-  
-
-
+      this.map.addLayer(markers);
+    },
+    error: (err) => console.error(err)
+  });  
   }
 
   private initMap(): void{
