@@ -1,1 +1,17 @@
 <div id="map"></div>
+
+<div class="infopanel" *ngIf="selectedToilet">
+
+    <button (click)="selectedToilet = null">X</button>
+    <p>Illemehely adatai</p>
+    <p>Név: {{selectedToilet.name || "Nincs megadva"}}</p>
+    <p>OSM_ID: {{selectedToilet.osm_id || "Nincs megadva"}}</p>
+    <p>Díj: {{selectedToilet.fee || "Nincs megadva"}}</p>
+    <p>Üzemeltető: {{selectedToilet.operator || "Nincs megadva"}}</p>
+    <p>Mozgáskorlátozott: {{selectedToilet.wheelchair || "Nincs megadva"}}</p>
+    <p>Nyitvatartás: {{selectedToilet.opening_hours || "Nincs megadva"}}</p>
+
+
+
+
+</div>

@@ -11,8 +11,21 @@ app.use(express.json());
 
 
 app.get('/toilets', async(req, res) =>{
-    try{
-        const result = await pool.query(`SELECT osm_id, name, amenity, ST_X(way::geometry) AS lon, ST_Y(way::geometry) AS lat FROM planet_osm_point WHERE amenity = 'toilets'`)
+const result = await pool.query(`SELECT 
+        osm_id, 
+        name, 
+        amenity, 
+        tags->'fee' AS fee,
+        tags->'operator' AS operator,
+        tags->'opening_hours' AS opening_hours,
+        tags->'wheelchair' AS wheelchair,
+        ST_X(way::geometry)) AS lon,    
+        ST_Y(way::geometry) AS lat
+      FROM planet_osm_point
+      WHERE amenity = 'toilets';`);
+
+try{
+        
         res.json(result.rows);
     }catch (err){
         console.error('DB error', err);

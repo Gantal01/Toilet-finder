@@ -1,6 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { HttpClientModule } from '@angular/common/http';
+import { NgIf } from "@angular/common";
+
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -10,7 +12,7 @@ import 'leaflet.markercluster';
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports:[HttpClientModule],
+  imports: [HttpClientModule, NgIf],
   providers:[ApiService],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
@@ -18,6 +20,8 @@ import 'leaflet.markercluster';
 export class MapComponent implements AfterViewInit{
 
   private map!: L.Map;
+
+  selectedToilet: any = null;
 
   constructor(private api: ApiService){}
 
@@ -78,7 +82,14 @@ export class MapComponent implements AfterViewInit{
       toilets.forEach((t: any) => {
         if (t.lat && t.lon) {
           const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
-          markers.addLayer(marker);
+         
+          marker.on('click', () => {
+            this.selectedToilet = t
+            console.log("WC: ", t)
+          });
+
+          markers.addLayer(marker);         
+
         }
       });
 
@@ -91,7 +102,7 @@ export class MapComponent implements AfterViewInit{
   private initMap(): void{
     this.map = L.map('map', {
       center: [47.4979, 19.0402], //Budapest koordinátái
-      zoom: 12,
+      zoom: 8.4,
       minZoom: 8
     });
 
@@ -104,7 +115,7 @@ export class MapComponent implements AfterViewInit{
   }
 
 
-  
+
 
 
 }
