@@ -91,7 +91,8 @@ export class MapComponent implements AfterViewInit{
   private initMap(): void{
     this.map = L.map('map', {
       center: [47.4979, 19.0402], //Budapest koordinátái
-      zoom: 12
+      zoom: 12,
+      minZoom: 8
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

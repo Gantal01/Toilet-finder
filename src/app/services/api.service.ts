@@ -10,7 +10,7 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   getToilets(): Observable<any>{
-    return this.http.get('http://localhost:3000/api/toilets');
+    return this.http.get('http://localhost:3000/toilets');
   }
 
 }
