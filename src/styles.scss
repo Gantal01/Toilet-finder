@@ -2,3 +2,30 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.custom-cluster-icon {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background-image: url('assets/toilet_marker.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+}
+
+.custom-cluster-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: darkblue;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 12px;
+    border: 2px solid white;
+}

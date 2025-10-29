@@ -34,32 +34,8 @@ export class MapComponent implements AfterViewInit{
             const count = cluster.getChildCount(); 
             return L.divIcon({
               html: `
-                <div style="
-                  position: relative;
-                  width: 60px;
-                  height: 60px;
-                  background-image: url('assets/toilet_marker.png');
-                  background-size: cover;
-                  background-repeat: no-repeat;
-                  background-position: center;
-                  border-radius: 50%;
-                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                ">
-                  <div style="
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    background-color: red;
-                    color: white;
-                    border-radius: 50%;
-                    width: 20px;
-                    height: 20px;
-                    text-align: center;
-                    line-height: 20px;
-                    font-weight: bold;
-                    font-size: 12px;
-                    border: 2px solid white;
-                  ">
+                <div class="custom-cluster-icon">
+                  <div class="custom-cluster-count">
                     ${count}
                   </div>
                 </div>
@@ -69,7 +45,7 @@ export class MapComponent implements AfterViewInit{
               iconAnchor: [15, 15] 
           });
         }
-        });
+      });
 
 
   this.api.getToilets().subscribe({
