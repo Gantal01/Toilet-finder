@@ -83,11 +83,18 @@ export class MapComponent implements AfterViewInit{
         if (t.lat && t.lon) {
           const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
          
-          marker.on('click', () => {
-            this.selectedToilet = t
-            console.log("WC: ", t)
-          });
+          
+            marker.on('click', () =>{
+              this.api.getToiletsById(t.osm_id).subscribe({
+                next: (fullToilet) => {
+                  this.selectedToilet = fullToilet;
+                  console.log("Részletes WC adatok:", fullToilet);
+                },
+                error: (err) => console.error(err)
+              });
 
+            });
+          
           markers.addLayer(marker);         
 
         }
