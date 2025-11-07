@@ -6,6 +6,8 @@ import { NgIf } from "@angular/common";
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
+import 'leaflet-gpx';
+
 
 
 
@@ -22,6 +24,12 @@ export class MapComponent implements AfterViewInit{
   private map!: L.Map;
 
   selectedToilet: any = null;
+
+  private userMarker!: L.Marker;
+  private routeLayer!: any;
+  private selectedToiletLatLng!: L.LatLng;
+
+  transportProfile: string = 'trekking';
 
   constructor(private api: ApiService){}
 
@@ -94,6 +102,56 @@ export class MapComponent implements AfterViewInit{
       attribution: '&copy; OpenStreetMap'
     }).addTo(this.map);
 
+
+  }
+
+
+  startRoute(){
+    if(!this.selectedToilet) return;
+
+    this.selectedToiletLatLng = L.latLng(this.selectedToilet.lat, this.selectedToilet.lon);
+
+    const clickHandler = (e: L.LeafletMouseEvent) => {
+      if(this.userMarker) this.map.removeLayer(this.userMarker);
+
+      this.userMarker = L.marker(e.latlng, {draggable: true}).addTo(this.map);
+      this.calculateRoute(e.latlng, this.selectedToiletLatLng);
+      this.map.off('click', clickHandler);  
+    };
+
+    this.map.on('click', clickHandler);
+
+  }
+
+  calculateRoute(start: L.LatLng, end: L.LatLng){
+    this.api.getRoute(start, end, this.transportProfile).subscribe({
+      next: (gpxText: string) => {
+        console.log("gpx", gpxText);
+        if(this.routeLayer) this.map.removeLayer(this.routeLayer);
+
+        // @ts-ignore
+        this.routeLayer = new L.GPX(gpxText, {
+          async: true,
+          marker_options: {
+            startIconUrl: 'assets/toilet_marker.png',
+            endIconUrl: 'assets/toilet_marker.png',
+            shadowUrl: null
+          },
+          polyline_options: {
+            color: 'darkblue',
+            weight: 6
+          }
+        }).on('addpoint', (e: any) => {
+            if(e.point_type === 'end' && e.marker){
+              this.map.removeLayer(e.marker);
+            }
+          })
+          .on('loaded', (e:any) => {
+            this.map.fitBounds(e.target.getBounds());
+          }).addTo(this.map)
+        },
+      error: (err) => console.error('Route fetch error', err)
+    });
 
   }
 

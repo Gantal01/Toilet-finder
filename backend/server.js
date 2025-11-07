@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const  pool = require('./db');
+const fetch = require('node-fetch')
 
 
 const app = express();
@@ -59,6 +60,23 @@ app.get('/toilets/:id', async(req, res) =>{
 
 
 });
+
+app.post('/route', async (req, res) => {
+    const {start, end, profile} = req.body;
+
+    try{
+        const url = `http://localhost:17777/brouter?lonlats=${start.lng},${start.lat}|${end.lng},${end.lat}&format=gpx&profile=${profile}`;
+        const response = await fetch(url);
+        const gpxText = await response.text();
+        res.send(gpxText);
+    }catch (err){
+        res.status(500).json({error:'Route fetch failed'})
+    }
+
+})
+
+
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

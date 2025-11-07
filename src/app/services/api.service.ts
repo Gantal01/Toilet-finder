@@ -16,4 +16,9 @@ export class ApiService {
   getToiletsById(osm_id: number): Observable<any>{
     return this.http.get(`http://localhost:3000/toilets/${osm_id}`);
   }
+
+  getRoute(start: {lat: number, lng: number}, end: {lat: number, lng: number}, profile: string): Observable<string>{
+    return this.http.post(`http://localhost:3000/route`, {start, end, profile}, {responseType: 'text'});
+  }
+
 }
