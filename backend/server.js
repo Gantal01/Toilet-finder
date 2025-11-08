@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const  pool = require('./db');
 const fetch = require('node-fetch')
+const passport = require('./passport')
+const authRoutes = require('./auth');
+require('dotenv').config({path: 'secret.env'});
 
 
 const app = express();
@@ -9,6 +12,8 @@ const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
+app.use(('/auth'), authRoutes);
 
 
 app.get('/toilets', async(req, res) =>{

@@ -29,7 +29,7 @@ export class MapComponent implements AfterViewInit{
   private routeLayer!: any;
   private selectedToiletLatLng!: L.LatLng;
 
-  transportProfile: string = 'trekking';
+  transportProfile: string = 'shortest';
 
   constructor(private api: ApiService){}
 
@@ -156,7 +156,20 @@ export class MapComponent implements AfterViewInit{
   }
 
 
+  googleRoute(){  
+    
+    var startLat = this.userMarker.getLatLng().lat;
+    var startLng = this.userMarker.getLatLng().lng;
+    var endLat = this.selectedToiletLatLng.lat;
+    var endLng = this.selectedToiletLatLng.lng;
 
+    const travelMode = 'walking';
+    const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${endLat},${endLng}&travelmode=${travelMode}`;
+
+    window.open(googleUrl, '_balnk');
+
+
+  }
 
 
 }

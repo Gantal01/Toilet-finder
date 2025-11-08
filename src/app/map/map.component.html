@@ -9,5 +9,6 @@
     <p>Üzemeltető: {{selectedToilet.operator || "Nincs megadva"}}</p>
     <p>Mozgáskorlátozott: {{selectedToilet.wheelchair || "Nincs megadva"}}</p>
     <p>Nyitvatartás: {{selectedToilet.opening_hours || "Nincs megadva"}}</p>
-    <button (click)="startRoute()">Útvonaltervezés</button>
+    <button (click)="startRoute()">Útvonaltervezés</button><br>
+    <button (click)="googleRoute()">Megnyitás Google Mapsben</button>
 </div>

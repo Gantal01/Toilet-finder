@@ -5,6 +5,15 @@
         <mat-label>Keresés</mat-label>
         <input matInput placeholder="Település">
     </mat-form-field>
-    <a mat-button routerLink="/login">Bejelentkezés</a>
-    <a mat-button routerLink="/register">Regisztráció</a>
+
+    <ng-container *ngIf="!isLoggedIn; else loginBlock">
+        <a mat-button routerLink="/login">Bejelentkezés</a>
+    </ng-container>
+
+    <ng-template #loginBlock>
+        <a mat-button routerLink="/profile">Profil</a>
+        <button mat-button (click)="logout()">Kijelentkezés</button>
+    </ng-template>
+
+    
 </mat-toolbar>

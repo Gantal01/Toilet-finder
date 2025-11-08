@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { RouterLink } from "@angular/router";
 import { MatInputModule } from "@angular/material/input";
+import { NgIf } from "@angular/common";
 
 
 @Component({
@@ -14,11 +15,30 @@ import { MatInputModule } from "@angular/material/input";
     MatToolbarModule,
     MatFormFieldModule,
     MatInputModule,
-    RouterLink
+    RouterLink,
+    NgIf
 ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+
+  isLoggedIn = false;
+
+
+  ngOnInit(): void {
+      this.checkLoginStatus();
+      
+  }
+
+  checkLoginStatus(){
+    const token = localStorage.getItem('jwt');
+    this.isLoggedIn = !!token;
+  }
+
+  logout(){
+    localStorage.removeItem('jwt');
+    this.isLoggedIn = false;
+  }
 
 }
