@@ -21,4 +21,12 @@ export class ApiService {
     return this.http.post(`http://localhost:3000/route`, {start, end, profile}, {responseType: 'text'});
   }
 
+  getUserById(user_id: number): Observable<any>{
+    return this.http.get(`http://localhost:3000/profil/${user_id}`);
+  }
+
+  getUsers(): Observable<any>{
+    return this.http.get(`http://localhost:3000/users`)
+  }
+
 }

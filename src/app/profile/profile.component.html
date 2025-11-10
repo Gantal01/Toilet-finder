@@ -1,1 +1,11 @@
-<p>profile works!</p>
+<div *ngIf="user">
+    <p>Name: {{ user.name }}</p>
+    <p>Email: {{user.email}}</p>
+    <p>Role: {{user.role}}</p>
+    <p>Google_ID: {{user.google_id}}</p>
+</div>
+
+<div *ngIf="!user">
+    <p>Betöltés....</p>
+</div>
+

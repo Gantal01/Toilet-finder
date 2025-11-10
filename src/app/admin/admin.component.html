@@ -1,0 +1,22 @@
+
+<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+<h2 style="padding-left: 100px;">Illemhelyek:</h2>
+<div *ngFor=" let toilet of toilets">
+    <p style="padding-left: 100px;">ID: {{ toilet.osm_id }}</p>
+</div>
+</div>
+
+<div style="flex: 1;">
+<h2>Felhasználók:</h2>
+<div *ngFor=" let user of users">
+    <p>GoogleID: {{ user.google_id }}</p>
+    <p>Név: {{ user.name }}</p>
+    <p>Emial: {{ user.email }}</p>
+    <p>Szerepkör: {{ user.role }}</p>
+</div>
+</div>
+
+
+
+
+

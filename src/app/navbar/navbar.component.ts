@@ -24,6 +24,7 @@ import { NgIf } from "@angular/common";
 export class NavbarComponent implements OnInit {
 
   isLoggedIn = false;
+  userRole: string | null = null;
 
 
   ngOnInit(): void {
@@ -33,12 +34,26 @@ export class NavbarComponent implements OnInit {
 
   checkLoginStatus(){
     const token = localStorage.getItem('jwt');
-    this.isLoggedIn = !!token;
+    
+    if(token){
+      this.isLoggedIn = true;
+
+      try{
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.userRole = payload.role || null;
+      }catch(err){
+        console.error('Token error:', err);
+      }
+    }else{
+      this.isLoggedIn = false;
+      this.userRole = null;
+    }
   }
 
   logout(){
     localStorage.removeItem('jwt');
     this.isLoggedIn = false;
+    this.userRole = null;
   }
 
 }

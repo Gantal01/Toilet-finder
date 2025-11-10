@@ -8,7 +8,7 @@ import { Router, ActivatedRoute } from "@angular/router";
   templateUrl: './login-success.component.html',
   styleUrl: './login-success.component.scss'
 })
-export class LoginSuccessComponent {
+export class LoginSuccessComponent implements OnInit{
 
 constructor(private route: ActivatedRoute, private router: Router){}
 
@@ -24,7 +24,7 @@ ngOnInit(): void {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('Felhasználó adatai:', payload);
-        localStorage.setItem('user', JSON.stringify(payload)); // mentsd el
+        localStorage.setItem('user', JSON.stringify(payload));
       } catch (e) {
         console.error('Hibás JWT formátum');
       }

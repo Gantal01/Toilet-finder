@@ -11,6 +11,7 @@
     </ng-container>
 
     <ng-template #loginBlock>
+        <a mat-button *ngIf="userRole === 'admin' " routerLink="/admin">Admin</a>
         <a mat-button routerLink="/profile">Profil</a>
         <button mat-button (click)="logout()">Kijelentkezés</button>
     </ng-template>

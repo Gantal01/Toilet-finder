@@ -16,6 +16,20 @@ app.use(passport.initialize());
 app.use(('/auth'), authRoutes);
 
 
+app.get('/users', async(req, res) => {
+    const result = await pool.query(
+        `SELECT * FROM users`
+    );
+
+    try{
+        res.json(result.rows);
+    }catch(err){
+        console.error("Database error:", err);
+    }
+    
+});
+
+
 app.get('/toilets', async(req, res) =>{
     const result = await pool.query(`SELECT 
         osm_id,        
@@ -79,6 +93,33 @@ app.post('/route', async (req, res) => {
     }
 
 })
+
+
+app.get('/profil/:id', async(req, res) => {
+    const {id} = req.params;
+    try{
+        const result = await pool.query(`
+            SELECT 
+            user_id,
+            google_id,
+            name,
+            role,
+            email
+            FROM users
+            WHERE user_id = $1;
+            `, [id]
+        );
+
+        if(result.rows.length === 0){
+            return res.status(404).json({message: 'User not found'})
+        }
+
+        res.json(result.rows[0]);
+    }catch(err){
+        res.status(500).json({error:'Database error'})
+    }
+
+});
 
 
 
