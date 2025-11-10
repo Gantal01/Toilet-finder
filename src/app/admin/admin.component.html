@@ -1,22 +1,22 @@
-
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-<h2 style="padding-left: 100px;">Illemhelyek:</h2>
-<div *ngFor=" let toilet of toilets">
-    <p style="padding-left: 100px;">ID: {{ toilet.osm_id }}</p>
-</div>
-</div>
-
-<div style="flex: 1;">
-<h2>Felhasználók:</h2>
-<div *ngFor=" let user of users">
-    <p>GoogleID: {{ user.google_id }}</p>
-    <p>Név: {{ user.name }}</p>
-    <p>Emial: {{ user.email }}</p>
-    <p>Szerepkör: {{ user.role }}</p>
-</div>
-</div>
-
-
-
-
-
+<mat-tab-group>
+  <mat-tab label="Felhasználók">
+    <div style="flex: 1">
+      <h2>Felhasználók:</h2>
+      <div *ngFor="let user of users">
+        <p>GoogleID: {{ user.google_id }}</p>
+        <p>Név: {{ user.name }}</p>
+        <p>Emial: {{ user.email }}</p>
+        <p>Szerepkör: {{ user.role }}</p>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label="Illemhelyek">
+    <h2 style="padding-left: 100px">Illemhelyek:</h2><br>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center">      
+      <div *ngFor="let toilet of toilets">
+        <p style="padding-left: 100px">ID: {{ toilet.osm_id }}</p>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label = "Új javaslatok">Új javaslatok</mat-tab>
+</mat-tab-group>
