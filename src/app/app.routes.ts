@@ -4,11 +4,13 @@ import { LoginComponent } from "./login/login.component";
 import { LoginSuccessComponent } from "./login/login-success/login-success.component";
 import { ProfileComponent } from './profile/profile.component';
 import { AdminComponent } from "./admin/admin.component";
+import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
 {path: '', component: MapComponent},
 {path: 'login', component: LoginComponent},
 {path: 'login-success', component: LoginSuccessComponent},
-{path: 'profile', component: ProfileComponent},
-{path: 'admin', component: AdminComponent}
+{path: 'profile', component: ProfileComponent, canActivate: [authGuard]},
+{path: 'admin', component: AdminComponent, canActivate: [adminGuard, authGuard]}
 ];
