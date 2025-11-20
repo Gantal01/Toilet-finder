@@ -60,10 +60,11 @@ export class NavbarComponent implements OnInit {
     this.isLoggedIn = false;
     this.userRole = null;
     window.dispatchEvent(new Event('authChange'));
-    this.router.navigate(['']);
+    this.router.navigate(['']);  
+  }
 
-    
-    
+  loginWithGoogle() {
+    window.location.href = 'http://localhost:3000/auth/google';
   }
 
 }
