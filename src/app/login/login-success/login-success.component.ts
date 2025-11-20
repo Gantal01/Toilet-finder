@@ -25,11 +25,12 @@ ngOnInit(): void {
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('Felhasználó adatai:', payload);
         localStorage.setItem('user', JSON.stringify(payload));
+        window.dispatchEvent(new Event('authChange'))
       } catch (e) {
         console.error('Hibás JWT formátum');
       }
 
-      this. router.navigate(['/']);
+      this.router.navigate(['/']);
     }
   })
 }

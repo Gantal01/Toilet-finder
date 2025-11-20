@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router } from "@angular/router";
 import { MatInputModule } from "@angular/material/input";
 import { NgIf } from "@angular/common";
 
@@ -26,9 +26,14 @@ export class NavbarComponent implements OnInit {
   isLoggedIn = false;
   userRole: string | null = null;
 
+  router = inject(Router);
+
 
   ngOnInit(): void {
       this.checkLoginStatus();
+      window.addEventListener('authChange', () => {
+        this.checkLoginStatus();
+      })
       
   }
 
@@ -54,6 +59,11 @@ export class NavbarComponent implements OnInit {
     localStorage.removeItem('jwt');
     this.isLoggedIn = false;
     this.userRole = null;
+    window.dispatchEvent(new Event('authChange'));
+    this.router.navigate(['']);
+
+    
+    
   }
 
 }
