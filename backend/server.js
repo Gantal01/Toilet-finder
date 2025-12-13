@@ -18,7 +18,7 @@ app.use(('/auth'), authRoutes);
 
 app.get('/users', async(req, res) => {
     const result = await pool.query(
-        `SELECT * FROM users`
+        `SELECT * FROM users_old`
     );
 
     try{
@@ -32,11 +32,12 @@ app.get('/users', async(req, res) => {
 
 app.get('/toilets', async(req, res) =>{
     const result = await pool.query(`SELECT 
-        osm_id,        
-        ST_X(way::geometry) AS lon,    
-        ST_Y(way::geometry) AS lat
-      FROM planet_osm_point
-      WHERE amenity = 'toilets';`);
+        toilet_id,
+        osm_id,     
+        ST_X(location::geometry) AS lon,    
+        ST_Y(location::geometry) AS lat
+      FROM toilets
+      WHERE osm_id IS NOT NULL OR approved = true;`);
 
         try{
             
@@ -53,17 +54,18 @@ app.get('/toilets/:id', async(req, res) =>{
     try{
     const result = await pool.query(`
         SELECT
+        toilet_id,
         osm_id, 
-        name, 
-        amenity, 
-        tags->'fee' AS fee,
-        tags->'operator' AS operator,
-        tags->'opening_hours' AS opening_hours,
-        tags->'wheelchair' AS wheelchair,
-        ST_X(way::geometry) AS lon,    
-        ST_Y(way::geometry) AS lat
-      FROM planet_osm_point
-      WHERE osm_id = $1;
+        name,
+        operator,
+        access, 
+        opening_hours,
+        wheelchair,
+        fee,
+        ST_X(location::geometry) AS lon,    
+        ST_Y(location::geometry) AS lat
+      FROM toilets
+      WHERE toilet_id = $1 AND (osm_id IS NOT NULL OR approved = true);
         `, [id]
     );
 
@@ -105,7 +107,7 @@ app.get('/profil/:id', async(req, res) => {
             name,
             role,
             email
-            FROM users
+            FROM users_old
             WHERE user_id = $1;
             `, [id]
         );

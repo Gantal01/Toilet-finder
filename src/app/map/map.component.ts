@@ -29,6 +29,8 @@ export class MapComponent implements AfterViewInit{
   private routeLayer!: any;
   private selectedToiletLatLng!: L.LatLng;
 
+  private lastGpxText: string | null = null;
+
   transportProfile: string = 'shortest';
 
   constructor(private api: ApiService){}
@@ -69,7 +71,7 @@ export class MapComponent implements AfterViewInit{
          
           
             marker.on('click', () =>{
-              this.api.getToiletsById(t.osm_id).subscribe({
+              this.api.getToiletsById(t.toilet_id).subscribe({
                 next: (fullToilet) => {
                   this.selectedToilet = fullToilet;
                   console.log("Részletes WC adatok:", fullToilet);
@@ -127,6 +129,9 @@ export class MapComponent implements AfterViewInit{
     this.api.getRoute(start, end, this.transportProfile).subscribe({
       next: (gpxText: string) => {
         console.log("gpx", gpxText);
+
+        this.lastGpxText = gpxText;
+
         if(this.routeLayer) this.map.removeLayer(this.routeLayer);
 
         // @ts-ignore
@@ -157,9 +162,15 @@ export class MapComponent implements AfterViewInit{
 
 
   googleRoute(){  
-    
+   
+    if (!this.userMarker || !this.selectedToiletLatLng) {
+    alert('Nincs elérhető útvonal!');
+    return;
+    }
+
     var startLat = this.userMarker.getLatLng().lat;
     var startLng = this.userMarker.getLatLng().lng;
+
     var endLat = this.selectedToiletLatLng.lat;
     var endLng = this.selectedToiletLatLng.lng;
 
@@ -168,6 +179,25 @@ export class MapComponent implements AfterViewInit{
 
     window.open(googleUrl, '_balnk');
 
+  }
+
+  downloadGpx(){
+
+    if(!this.lastGpxText){
+      alert('Nincs letölthető útvonal!');
+      return;
+    }
+
+    const blob = new Blob([this.lastGpxText], {type: 'application/gpx+xml;charset=utf-8'});
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "utvonal.gpx";
+    a.click();
+
+    window.URL.revokeObjectURL(url);
 
   }
 
