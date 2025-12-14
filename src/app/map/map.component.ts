@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import { NgIf } from "@angular/common";
+import {ToiletPanelComponent} from '../components/toilet-panel/toilet-panel.component';
 
 
 import * as L from 'leaflet';
@@ -14,7 +15,7 @@ import 'leaflet-gpx';
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [HttpClientModule, NgIf],
+  imports: [ NgIf, ToiletPanelComponent],
   providers:[ApiService],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'

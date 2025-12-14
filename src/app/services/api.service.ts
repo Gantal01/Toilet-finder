@@ -29,4 +29,16 @@ export class ApiService {
     return this.http.get(`http://localhost:3000/users`)
   }
 
+  getRatings(toilet_id: number): Observable<any>{
+    return this.http.get(`http://localhost:3000/rating/${toilet_id}`);
+  }
+
+  getRatingAverage(toilet_id: number): Observable<{average: number, count: number}>{
+    return this.http.get<{average: number, count: number}>(`http://localhost:3000/rating/average/${toilet_id}`);
+  }
+
+  postRating(data: {toilet_id: number, value: number, description: string}) {
+    return this.http.post(`http://localhost:3000/rating`, data)
+  }
+
 }

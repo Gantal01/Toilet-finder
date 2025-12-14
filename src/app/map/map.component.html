@@ -1,5 +1,16 @@
 <div id="map"></div>
 
+<app-toilet-panel
+    [toilet] = "selectedToilet"
+    (close) = "selectedToilet = null"
+    (startRoute) = "startRoute()"
+    (googleRoute) = "googleRoute()"
+    (downloadGpx) = "downloadGpx()">
+</app-toilet-panel>
+
+
+
+<!--
 <div class="infopanel" *ngIf="selectedToilet">
     <button (click)="selectedToilet = null">X</button>
     <p>Illemehely adatai</p>
@@ -13,3 +24,4 @@
     <button (click)="googleRoute()">Megnyitás Google Mapsben</button>
     <button (click)="downloadGpx()">.gpx útvonal fájl letöltése</button>
 </div>
+--->

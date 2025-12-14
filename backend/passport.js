@@ -2,6 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const pool = require('./db.js');
 require('dotenv').config({path: 'secret.env'});
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 
 
 passport.use(new GoogleStrategy({
@@ -44,5 +45,31 @@ async (asccesToken, refreshToken, profile, done) => {
         done(err, null);
     }
 }));
+
+
+const jwtOptions = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET
+}
+
+passport.use(
+  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
+    try {
+      const result = await pool.query(
+        'SELECT user_id, email, role FROM users WHERE user_id = $1',
+        [jwtPayload.user_id]
+      );
+
+      if (result.rows.length === 0) {
+        return done(null, false);
+      }
+
+      return done(null, result.rows[0]);
+    } catch (err) {
+      return done(err, false);
+    }
+  })
+);
+
 
 module.exports = passport;

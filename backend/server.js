@@ -107,7 +107,7 @@ app.get('/profil/:id', async(req, res) => {
             name,
             role,
             email
-            FROM users_old
+            FROM users
             WHERE user_id = $1;
             `, [id]
         );
@@ -123,7 +123,75 @@ app.get('/profil/:id', async(req, res) => {
 
 });
 
+app.get('/rating/:toilet_id', async(req, res) => {
+    const {toilet_id} = req.params;
+    try{
+        const result = await pool.query(`
+            SELECT
+            rating_id,
+            user_id,
+            toilet_id,
+            value,
+            description,
+            creation_time
+            FROM ratings
+            WHERE toilet_id = $1;`, [toilet_id]
+        );
 
+        res.json(result.rows);
+        
+    }catch(err){
+        res.status(500).json({error: 'Database error'});
+    }
+});
+
+
+app.get('/rating/average/:toilet_id', async(req, res) => {
+    const {toilet_id} = req.params;
+    try{
+        const result = await pool.query(`
+            SELECT
+            COUNT(*)::int AS count,
+            COALESCE(ROUND(AVG(value)::numeric, 1), 0) AS average
+            FROM ratings
+            WHERE toilet_id = $1;`, [toilet_id]
+        );
+
+        res.json(result.rows[0]);
+        
+    }catch(err){
+        res.status(500).json({error: 'Database error'});
+    }
+});
+
+app.post('/rating', passport.authenticate('jwt', {session: false}), async(req, res) => {
+    const { toilet_id, value, description } = req.body;
+    const user_id = req.user.user_id;
+
+    if (!toilet_id || !value || value < 1 || value > 5) {
+      return res.status(400).json({ message: 'Invalid rating data' });
+    }
+
+    try{
+        const result = await pool.query(`
+            INSERT INTO ratings (user_id, toilet_id, value, description)
+            VALUES ($1, $2, $3, $4)
+            RETURNING rating_id, toilet_id, value, description, creation_time;
+            `, [user_id, toilet_id, value, description]
+        );
+
+        res.status(201).json(result.rows[0]);
+    }catch(err){
+        if(err.code === '23505'){
+            return res.status(409).json({message: 'Already rated'});
+        }
+
+        console.error('Database error', err);
+        res.status(500).json({message: 'Database error'});
+
+    }
+
+});
 
 
 app.listen(PORT, () => {
