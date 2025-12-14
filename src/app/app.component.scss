@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+app-navbar {
+  flex: 0 0 auto;   // a navbar akkora, amekkora kell
+}
+
+.app-content {
+  flex: 1 1 auto;   // ⬅ kitölti a maradék helyet
+  position: relative;
+  overflow: hidden;
+}

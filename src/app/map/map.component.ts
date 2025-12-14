@@ -5,6 +5,7 @@ import { NgIf } from "@angular/common";
 import {ToiletPanelComponent} from '../components/toilet-panel/toilet-panel.component';
 
 
+
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet-gpx';

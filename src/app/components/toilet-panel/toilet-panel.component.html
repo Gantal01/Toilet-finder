@@ -25,6 +25,30 @@
     <br>
     <mat-divider></mat-divider>
     <br>
+
+    <div class="ratings-section">
+
+        <h4>Vélemények</h4>
+
+        <div class="ratings-list">      
+            <div *ngFor="let rat of ratings">
+                <p>{{rat.user_name}}</p>
+                <p>{{rat.creation_time | date: 'yyyy. MM. dd.'}}</p>
+                <app-star-rating
+                [rating]="rat.value"
+                [readonly]="true">
+                </app-star-rating>
+                <p>{{rat.description}}</p>
+            </div>
+            <br>
+        </div>
+    </div>
+    <br>
+    <mat-divider></mat-divider>
+    <br>
+    <h4>Vélemény írás</h4>
+
+   
     <app-star-rating
         [(rating)]="userRating">
     </app-star-rating>

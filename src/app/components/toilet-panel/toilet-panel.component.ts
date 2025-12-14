@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import {NgIf} from '@angular/common';
+import {NgIf, NgFor, DatePipe} from '@angular/common';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
@@ -10,7 +10,7 @@ import {ApiService} from '../../services/api.service';
 @Component({
   selector: 'app-toilet-panel',
   standalone: true,
-  imports: [NgIf, FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, StarRatingComponent],
+  imports: [NgIf, NgFor, FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, StarRatingComponent, DatePipe],
   templateUrl: './toilet-panel.component.html',
   styleUrl: './toilet-panel.component.scss'
 })
@@ -23,13 +23,24 @@ export class ToiletPanelComponent implements OnChanges {
   ratingCount = 0;
   userRating = 0;
   description = "";
+
+  ratings: any[] = [];
   
   constructor(private api: ApiService){}
 
   ngOnChanges(changes: SimpleChanges): void {
       if(changes['toilet'] &&  this.toilet){
         this.loadRatingAverage(this.toilet.toilet_id);
+
+        this.api.getRatings(this.toilet.toilet_id).subscribe({
+        next: (data) => {
+          this.ratings = data;
+        },
+        error: (err) => console.error("API error", err)
+      });
       }
+
+
   }
   
 

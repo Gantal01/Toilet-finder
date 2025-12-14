@@ -1,12 +1,14 @@
-<div id="map"></div>
+<div id="map-wrapper">
+    <div id="map"></div>
 
-<app-toilet-panel
-    [toilet] = "selectedToilet"
-    (close) = "selectedToilet = null"
-    (startRoute) = "startRoute()"
-    (googleRoute) = "googleRoute()"
-    (downloadGpx) = "downloadGpx()">
-</app-toilet-panel>
+    <app-toilet-panel
+        [toilet] = "selectedToilet"
+        (close) = "selectedToilet = null"
+        (startRoute) = "startRoute()"
+        (googleRoute) = "googleRoute()"
+        (downloadGpx) = "downloadGpx()">
+    </app-toilet-panel>
+</div>
 
 
 

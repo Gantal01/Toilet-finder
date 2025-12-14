@@ -128,14 +128,15 @@ app.get('/rating/:toilet_id', async(req, res) => {
     try{
         const result = await pool.query(`
             SELECT
-            rating_id,
-            user_id,
-            toilet_id,
-            value,
-            description,
-            creation_time
-            FROM ratings
-            WHERE toilet_id = $1;`, [toilet_id]
+            r.toilet_id,
+            r.value,
+            r.description,
+            r.creation_time,
+            COALESCE(u.nickname, u.name) AS user_name
+            FROM ratings r
+            JOIN users u ON u.user_id = r.user_id
+            WHERE r.toilet_id = $1
+            ORDER BY r.creation_time DESC;`, [toilet_id]
         );
 
         res.json(result.rows);
