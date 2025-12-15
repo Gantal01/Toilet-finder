@@ -4,7 +4,8 @@ import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { RouterLink, Router } from "@angular/router";
 import { MatInputModule } from "@angular/material/input";
-import { NgIf } from "@angular/common";
+import { NgIf, AsyncPipe } from "@angular/common";
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -16,55 +17,27 @@ import { NgIf } from "@angular/common";
     MatFormFieldModule,
     MatInputModule,
     RouterLink,
-    NgIf
+    NgIf,
+    AsyncPipe
 ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
 
-  isLoggedIn = false;
-  userRole: string | null = null;
+  constructor(public auth: AuthService, private router: Router){}
+ 
 
-  router = inject(Router);
-
-
-  ngOnInit(): void {
-      this.checkLoginStatus();
-      window.addEventListener('authChange', () => {
-        this.checkLoginStatus();
-      })
-      
+  loginWithGoogle(){
+    this.auth.loginWithGoogle();
   }
 
-  checkLoginStatus(){
-    const token = localStorage.getItem('jwt');
-    
-    if(token){
-      this.isLoggedIn = true;
-
-      try{
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        this.userRole = payload.role || null;
-      }catch(err){
-        console.error('Token error:', err);
-      }
-    }else{
-      this.isLoggedIn = false;
-      this.userRole = null;
-    }
-  }
 
   logout(){
-    localStorage.removeItem('jwt');
-    this.isLoggedIn = false;
-    this.userRole = null;
-    window.dispatchEvent(new Event('authChange'));
+    this.auth.logout();
     this.router.navigate(['']);  
   }
 
-  loginWithGoogle() {
-    window.location.href = 'http://localhost:3000/auth/google';
-  }
+
 
 }

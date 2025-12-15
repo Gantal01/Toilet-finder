@@ -6,14 +6,16 @@
         <input matInput placeholder="Település">
     </mat-form-field>
 
-    <ng-container *ngIf="!isLoggedIn; else loginBlock">
+    <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
         <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
     </ng-container>
 
     <ng-template #loginBlock>
-        <a mat-button *ngIf="userRole === 'admin' " routerLink="/admin">Admin</a>
-        <a mat-button routerLink="/profile">Profil</a>
-        <button mat-button (click)="logout()">Kijelentkezés</button>
+        <ng-container *ngIf="auth.user$ | async as user">
+            <a mat-button *ngIf="user.role === 'admin' " routerLink="/admin">Admin</a>
+            <a mat-button routerLink="/profile">Profil</a>
+            <button mat-button (click)="logout()">Kijelentkezés</button>
+        </ng-container>
     </ng-template>
 
     

@@ -1,16 +1,18 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import {NgIf, NgFor, DatePipe} from '@angular/common';
+import {NgIf, NgFor, DatePipe, AsyncPipe} from '@angular/common';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatDividerModule} from '@angular/material/divider';
 import {StarRatingComponent} from '../star-rating/star-rating.component';
 import {ApiService} from '../../services/api.service';
+import {MatRadioButton, MatRadioChange, MatRadioGroup} from '@angular/material/radio';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-toilet-panel',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, StarRatingComponent, DatePipe],
+  imports: [NgIf, NgFor, FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, StarRatingComponent, DatePipe, MatRadioButton, MatRadioGroup, AsyncPipe],
   templateUrl: './toilet-panel.component.html',
   styleUrl: './toilet-panel.component.scss'
 })
@@ -23,10 +25,10 @@ export class ToiletPanelComponent implements OnChanges {
   ratingCount = 0;
   userRating = 0;
   description = "";
-
+  transportMode: string ="";
   ratings: any[] = [];
   
-  constructor(private api: ApiService){}
+  constructor(private api: ApiService, public auth: AuthService){}
 
   ngOnChanges(changes: SimpleChanges): void {
       if(changes['toilet'] &&  this.toilet){
@@ -49,6 +51,13 @@ export class ToiletPanelComponent implements OnChanges {
   @Output() startRoute = new EventEmitter<void>();
   @Output() googleRoute = new EventEmitter<void>();
   @Output() downloadGpx = new EventEmitter<void>();
+  @Output() TransportModeChange = new EventEmitter<string>();
+
+
+  onModeChange(event: MatRadioChange){
+    this.transportMode = event.value;
+    this.TransportModeChange.emit(event.value);
+  }
 
 
   private loadRatingAverage(toilet_id: number): void{

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-success',
@@ -10,14 +11,14 @@ import { Router, ActivatedRoute } from "@angular/router";
 })
 export class LoginSuccessComponent implements OnInit{
 
-constructor(private route: ActivatedRoute, private router: Router){}
+constructor(private route: ActivatedRoute, private router: Router, private auth: AuthService){}
 
 
 ngOnInit(): void {
   this.route.queryParams.subscribe(params => {
     const token = params['token'];
     if(token) {
-      localStorage.setItem('jwt', token);
+      this.auth.login(token);
       console.log('JWT token: ', token);
 
 

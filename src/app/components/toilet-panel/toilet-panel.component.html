@@ -2,7 +2,7 @@
 
     <button (click)="close.emit()">X</button>
 
-    <p>Illemehely adatai</p>
+    <h4>Illemehely adatai</h4>
 
     <app-star-rating
         [rating]="averageRating"
@@ -18,7 +18,17 @@
     <p>Nyitvatartás: {{toilet.opening_hours || "Nincs megadva"}}</p>
      <br>
      <mat-divider></mat-divider>
-     <br>
+     <h4>Útvonaltervezés</h4>
+
+    <mat-radio-group aria-label="profile"
+    [value]="transportMode"
+    (change) = "onModeChange($event)">
+    <mat-radio-button value="shortest">Gyalog</mat-radio-button>
+    <mat-radio-button value="mtb">Kerékpár</mat-radio-button>
+    <mat-radio-button value="car-vario">Autó</mat-radio-button>
+    </mat-radio-group>
+    <br>
+
     <button (click)="startRoute.emit()">Útvonaltervezés</button><br>
     <button (click)="googleRoute.emit()">Megnyitás Google Mapsben</button> <br>
     <button (click)="downloadGpx.emit()">.gpx útvonal fájl letöltése</button><br>
@@ -46,19 +56,26 @@
     <br>
     <mat-divider></mat-divider>
     <br>
-    <h4>Vélemény írás</h4>
+    <div *ngIf="auth.isLoggedIn$ | async; else loginRequired">
+        <h4>Írjon véleményt</h4>
+    
+        <app-star-rating
+            [(rating)]="userRating">
+        </app-star-rating>
 
-   
-    <app-star-rating
-        [(rating)]="userRating">
-    </app-star-rating>
+        <form class="example-form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Írj véleményt</mat-label>
+                <textarea matInput placeholder="Írd le a véleményed erről az illemhelyről" [(ngModel)]="description" name="description"></textarea>
+            </mat-form-field>
+        </form>
+        <button (click)="submitRating()" [disabled]="userRating === 0" >Küldés</button><br>
+    </div>
 
-    <form class="example-form">
-        <mat-form-field class="example-full-width">
-            <mat-label>Írj véleményt</mat-label>
-            <textarea matInput placeholder="Írd le a véleményed erről az illemhelyről" [(ngModel)]="description" name="description"></textarea>
-        </mat-form-field>
-    </form>
-    <button (click)="submitRating()" [disabled]="userRating === 0" >Küldés</button><br>
+    <ng-template #loginRequired>
+        <p>Értékeléshez bejelntkezés szükséges</p>
+    </ng-template>
+
+
 
 </div>
