@@ -7,6 +7,19 @@ import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet-gpx';
 
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconUrl: 'assets/toilet_marker.png',
+  iconRetinaUrl: 'assets/toilet_marker.png',
+  shadowUrl: null,
+  iconSize: [60, 60],
+  iconAnchor: [30, 60],
+  popupAnchor: [0, -60],
+});
+
+
+
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -27,7 +40,12 @@ export class MapComponent implements AfterViewInit {
 
   private lastGpxText: string | null = null;
 
+   private currentPosMarker!: L.Marker;
+
   transportProfile: string = '';
+
+
+  
 
   onTransportModeChange(mode: string) {
     this.transportProfile = mode;
@@ -66,7 +84,7 @@ export class MapComponent implements AfterViewInit {
     this.api.getToilets().subscribe({
       next: (toilets) => {
         const toiletIcon = L.icon({
-          iconUrl: '../../assets/toilet_marker.png',
+          iconUrl: 'assets/toilet_marker.png',
           iconSize: [60, 60],
         });
 
@@ -92,9 +110,16 @@ export class MapComponent implements AfterViewInit {
       },
       error: (err) => console.error(err),
     });
+
+
+     this.currentPosition();
+
   }
 
   private initMap(): void {
+
+    const currentPos = this.locationService.getCurrentLocation();
+
     this.map = L.map('map', {
       center: [47.4979, 19.0402], //Budapest koordinátái
       zoom: 8.4,
@@ -122,6 +147,15 @@ export class MapComponent implements AfterViewInit {
 
       this.userMarker = L.marker(e.latlng, { draggable: true }).addTo(this.map);
       this.calculateRoute(e.latlng, this.selectedToiletLatLng);
+
+
+      this.userMarker.on('dragend', (event: L.LeafletEvent) => {
+        const marker = event.target as L.Marker;
+        const newPosition = marker.getLatLng();
+        this.startRouteLatLng = newPosition;
+        this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
+      })
+
       this.map.off('click', clickHandler);
     };
 
@@ -135,13 +169,25 @@ export class MapComponent implements AfterViewInit {
 
         this.lastGpxText = gpxText;
 
+          const startIcon = L.icon({
+          iconUrl: 'assets/greenDot.png',
+          iconSize: [30,30],
+          iconAnchor: [10,10],  
+          });
+           const endIcon = L.icon({
+          iconUrl: 'assets/redDot.png',
+          iconSize: [30,30],
+          iconAnchor: [10,10],  
+          });
+
+
         // @ts-ignore
         const newRouteLayer = new L.GPX(gpxText, {
           async: true,
-          marker_options: {
-            startIconUrl: '../../assets/toilet_marker.png',
-            endIconUrl: '../../assets/toilet_marker.png.png',
-            shadowUrl: null,
+          markers: {
+            startIcon: startIcon,
+            endIcon: endIcon,
+            wptIcons: {},
           },
           polyline_options: {
             color: 'darkblue',
@@ -244,7 +290,7 @@ export class MapComponent implements AfterViewInit {
 
       this.userMarker = L.marker(startLatLng, {
         icon: L.icon({
-          iconUrl: '../../assets/toilet_marker.png',
+          iconUrl: 'assets/toilet_marker.png',
           iconSize: [60, 60],
         }),
       }).addTo(this.map);
@@ -253,6 +299,30 @@ export class MapComponent implements AfterViewInit {
 
       this.calculateRoute(startLatLng, this.selectedToiletLatLng);
     } catch (err) {
+      console.log('Position error', err);
+    }
+  }
+
+
+  async currentPosition() {
+    try{
+      const position = await this.locationService.getCurrentLocation();
+
+      const latlng = L.latLng(position.lat, position.lng);
+
+      if(this.currentPosMarker){
+        this.map.removeLayer(this.currentPosMarker);
+      }
+
+
+      this.currentPosMarker = L.marker(latlng, {
+        icon: L.icon({
+          iconUrl: 'assets/currentPosition.png',
+          iconSize: [60,60]
+        }),
+      }).addTo(this.map);
+
+    }catch (err){
       console.log('Position error', err);
     }
   }
