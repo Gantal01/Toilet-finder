@@ -1,43 +1,85 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { NgIf } from '@angular/common';
+import { NgIf, } from '@angular/common';
+import { MatButton } from "@angular/material/button";
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import {FormsModule} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {AuthService} from '../services/auth.service';
+
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, MatButton, MatFormField, MatLabel, FormsModule, MatInputModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent implements AfterViewInit {
+export class ProfileComponent implements OnInit {
   userId: number | null = null;
   user: any;
 
-  constructor(private api: ApiService) {}
+  formTrigger: boolean = false;
+  newNickname: string = "";
 
-  ngAfterViewInit(): void {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      try {
-        console.log('Token payload:', token.split('.')[1]);
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Decoded payload:', payload);
-        const userIdString = payload.user_id || payload.sub;
+  constructor(private api: ApiService, private auth: AuthService) {}
 
+  ngOnInit(): void {
+  this.auth.user$.subscribe(user => {
+    if (!user || !user.user_id) return;
 
-        if (userIdString) {
-          this.userId = Number(userIdString);
+    this.userId = user.user_id;
 
-          this.api.getUserById(this.userId).subscribe({
-            next: (user) => {console.log('User info:', user);
-              this.user = user;
-            },
-            error: err => {console.error('Api hiba: ', err);}
-          });
-        }
-      } catch (err) {
-        console.error('Wrong format', err);
-      }
+    this.api.getUserById(this.userId!).subscribe({
+      next: userData => this.user = userData,
+      error: err => console.error('API error', err)
+    });
+  });
+}
+
+ 
+
+  formTriggerFunc(){
+    if(!this.formTrigger){
+      this.formTrigger = true;
+    }else{
+      this.formTrigger = false;
     }
   }
+
+  setNewNickname(){
+    if(!this.newNickname || this.userId === null){
+      return;
+    }
+
+
+    this.api.putNickname(this.newNickname, this.userId).subscribe({
+      next: (updatedUser) =>{
+        this.user = updatedUser;
+        this.formTrigger = false;
+      },
+      error: err => {
+        console.error('Nickname update error', err);
+      }
+    });
+  }
+
+
+  removeNicskname(){
+    if(this.userId === null){
+      return;
+    }
+
+
+    this.api.removeNickname( this.userId).subscribe({
+      next: updatedUser =>{
+        this.user = updatedUser;
+        this.formTrigger = false;
+      },
+      error: err => {
+        console.error('Nickname remove error', err);
+      }
+    });
+  }
+
 }

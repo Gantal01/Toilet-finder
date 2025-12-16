@@ -1,8 +1,32 @@
-<div *ngIf="user">
+<div *ngIf="user && formTrigger === false">
     <p>Name: {{ user.name }}</p>
     <p>Email: {{user.email}}</p>
-    <p>Role: {{user.role}}</p>
-    <p>Google_ID: {{user.google_id}}</p>
+    <p *ngIf="user.role === 'admin'">Szerepkör: {{user.role}}</p>
+    <p *ngIf="user.nickname">Nickname: {{user.nickname}}</p>
+    <p *ngIf="!user.nickname">Nickname: Nincs megadva</p>
+    <button mat-button (click)="formTriggerFunc()">Nickname módosítása</button>
+</div>
+
+
+<div *ngIf="user && formTrigger === true">
+
+    <p>Name: {{ user.name }}</p>
+    <p>Email: {{user.email}}</p>
+    <form class="example-form" (ngSubmit)="setNewNickname()">
+      <mat-form-field class="example-full-width">
+        <mat-label>Adj meg becenevet:</mat-label>
+         <input
+            matInput
+            [(ngModel)]="newNickname"
+            placeholder="Új becenév"
+            name = "nickname"
+        />
+      </mat-form-field>
+    </form>
+    <button mat-button (click)="setNewNickname()">Mentés</button>
+    <button mat-button (click)="formTriggerFunc()">Mégse</button>
+    <button mat-button (click)="removeNicskname()">Ninckname törlése</button>
+
 </div>
 
 <div *ngIf="!user">

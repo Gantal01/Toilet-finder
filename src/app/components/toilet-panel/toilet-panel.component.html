@@ -1,81 +1,80 @@
 <div class="infopanel" *ngIf="toilet">
+  <button (click)="close.emit()">X</button>
 
-    <button (click)="close.emit()">X</button>
+  <h4>Illemehely adatai</h4>
 
-    <h4>Illemehely adatai</h4>
+  <app-star-rating [rating]="averageRating" [readonly]="true">
+  </app-star-rating>
+  <p>{{ ratingCount }} értékelés</p>
 
-    <app-star-rating
-        [rating]="averageRating"
-        [readonly]="true">
-    </app-star-rating>
-    <p>{{ ratingCount }} értékelés</p>
+  <p>Név: {{ toilet.name || "Nincs megadva" }}</p>
+  <p>OSM_ID: {{ toilet.osm_id || "Nincs megadva" }}</p>
+  <p>Díj: {{ toilet.fee || "Nincs megadva" }}</p>
+  <p>Üzemeltető: {{ toilet.operator || "Nincs megadva" }}</p>
+  <p>Mozgáskorlátozott: {{ toilet.wheelchair || "Nincs megadva" }}</p>
+  <p>Nyitvatartás: {{ toilet.opening_hours || "Nincs megadva" }}</p>
+  <br />
+  <mat-divider></mat-divider>
+  <h4>Útvonaltervezés</h4>
 
-    <p>Név: {{toilet.name || "Nincs megadva"}}</p>
-    <p>OSM_ID: {{toilet.osm_id || "Nincs megadva"}}</p>
-    <p>Díj: {{toilet.fee || "Nincs megadva"}}</p>
-    <p>Üzemeltető: {{toilet.operator || "Nincs megadva"}}</p>
-    <p>Mozgáskorlátozott: {{toilet.wheelchair || "Nincs megadva"}}</p>
-    <p>Nyitvatartás: {{toilet.opening_hours || "Nincs megadva"}}</p>
-     <br>
-     <mat-divider></mat-divider>
-     <h4>Útvonaltervezés</h4>
-
-    <mat-radio-group aria-label="profile"
+  <mat-radio-group
+    aria-label="profile"
     [value]="transportMode"
-    (change) = "onModeChange($event)">
+    (change)="onModeChange($event)"
+  >
     <mat-radio-button value="shortest">Gyalog</mat-radio-button>
     <mat-radio-button value="mtb">Kerékpár</mat-radio-button>
     <mat-radio-button value="car-vario">Autó</mat-radio-button>
-    </mat-radio-group>
-    <br>
+  </mat-radio-group>
+  <br />
 
-    <button (click)="startRoute.emit()">Útvonaltervezés</button><br>
-    <button (click)="googleRoute.emit()">Megnyitás Google Mapsben</button> <br>
-    <button (click)="downloadGpx.emit()">.gpx útvonal fájl letöltése</button><br>
-    <br>
-    <mat-divider></mat-divider>
-    <br>
+  <button mat-button (click)="startRoute.emit()">Útvonaltervezés</button><br />
+  <button mat-button (click)="googleRoute.emit()">Megnyitás Google Mapsben</button> <br />
+  <button mat-button (click)="downloadGpx.emit()">.gpx útvonal fájl letöltése</button
+  ><br />
+  <br />
+  <mat-divider></mat-divider>
+  <br />
 
-    <div class="ratings-section">
+  <div class="ratings-section">
+    <h4>Vélemények</h4>
 
-        <h4>Vélemények</h4>
-
-        <div class="ratings-list">      
-            <div *ngFor="let rat of ratings">
-                <p>{{rat.user_name}}</p>
-                <p>{{rat.creation_time | date: 'yyyy. MM. dd.'}}</p>
-                <app-star-rating
-                [rating]="rat.value"
-                [readonly]="true">
-                </app-star-rating>
-                <p>{{rat.description}}</p>
-            </div>
-            <br>
-        </div>
-    </div>
-    <br>
-    <mat-divider></mat-divider>
-    <br>
-    <div *ngIf="auth.isLoggedIn$ | async; else loginRequired">
-        <h4>Írjon véleményt</h4>
-    
-        <app-star-rating
-            [(rating)]="userRating">
+    <div class="ratings-list">
+      <div *ngFor="let rat of ratings">
+        <p>{{ rat.user_name }}</p>
+        <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+        <app-star-rating [rating]="rat.value" [readonly]="true">
         </app-star-rating>
-
-        <form class="example-form">
-            <mat-form-field class="example-full-width">
-                <mat-label>Írj véleményt</mat-label>
-                <textarea matInput placeholder="Írd le a véleményed erről az illemhelyről" [(ngModel)]="description" name="description"></textarea>
-            </mat-form-field>
-        </form>
-        <button (click)="submitRating()" [disabled]="userRating === 0" >Küldés</button><br>
+        <p>{{ rat.description }}</p>
+      </div>
+      <br />
     </div>
+  </div>
+  <br />
+  <mat-divider></mat-divider>
+  <br />
+  <div *ngIf="auth.isLoggedIn$ | async; else loginRequired">
+    <h4>Írjon véleményt</h4>
 
-    <ng-template #loginRequired>
-        <p>Értékeléshez bejelntkezés szükséges</p>
-    </ng-template>
+    <app-star-rating [(rating)]="userRating"> </app-star-rating>
 
+    <form class="example-form">
+      <mat-form-field class="example-full-width">
+        <mat-label>Írj véleményt</mat-label>
+        <textarea
+          matInput
+          placeholder="Írd le a véleményed erről az illemhelyről"
+          [(ngModel)]="description"
+          name="description"
+        ></textarea>
+      </mat-form-field>
+    </form>
+    <button mat-button (click)="submitRating()" [disabled]="userRating === 0">
+      Küldés</button
+    ><br />
+  </div>
 
-
+  <ng-template #loginRequired>
+    <p>Értékeléshez bejelntkezés szükséges</p>
+  </ng-template>
 </div>

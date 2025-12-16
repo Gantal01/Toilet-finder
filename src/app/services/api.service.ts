@@ -41,4 +41,12 @@ export class ApiService {
     return this.http.post(`http://localhost:3000/rating`, data)
   }
 
+  putNickname(nickname: string, userId: number){
+    return this.http.put(`http://localhost:3000/users/${userId}/nickname`, {nickname});
+  }
+
+  removeNickname(userId: number){
+    return this.http.put(`http://localhost:3000/users/${userId}/nickname/remove`, {});
+  }
+
 }
