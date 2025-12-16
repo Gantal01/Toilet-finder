@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { ToiletPanelComponent } from '../components/toilet-panel/toilet-panel.component';
+import { LocationService } from '../services/location.service';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -31,13 +32,15 @@ export class MapComponent implements AfterViewInit {
   onTransportModeChange(mode: string) {
     this.transportProfile = mode;
 
-    if(this.startRouteLatLng && this.selectedToilet){
+    if (this.startRouteLatLng && this.selectedToilet) {
       this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
     }
-
   }
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private locationService: LocationService
+  ) {}
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -63,7 +66,7 @@ export class MapComponent implements AfterViewInit {
     this.api.getToilets().subscribe({
       next: (toilets) => {
         const toiletIcon = L.icon({
-          iconUrl: 'assets/toilet_marker.png',
+          iconUrl: '../../assets/toilet_marker.png',
           iconSize: [60, 60],
         });
 
@@ -136,8 +139,8 @@ export class MapComponent implements AfterViewInit {
         const newRouteLayer = new L.GPX(gpxText, {
           async: true,
           marker_options: {
-            startIconUrl: 'assets/toilet_marker.png',
-            endIconUrl: 'assets/toilet_marker.png',
+            startIconUrl: '../../assets/toilet_marker.png',
+            endIconUrl: '../../assets/toilet_marker.png.png',
             shadowUrl: null,
           },
           polyline_options: {
@@ -146,7 +149,7 @@ export class MapComponent implements AfterViewInit {
           },
         })
           .on('loaded', (e: any) => {
-            if(this.routeLayer){
+            if (this.routeLayer) {
               this.map.removeLayer(this.routeLayer);
             }
             this.routeLayer = newRouteLayer;
@@ -218,5 +221,39 @@ export class MapComponent implements AfterViewInit {
     a.click();
 
     window.URL.revokeObjectURL(url);
+  }
+
+  async startRouteFromCurrentLocation() {
+    if (!this.selectedToilet) {
+      return;
+    }
+
+    try {
+      const position = await this.locationService.getCurrentLocation();
+
+      const startLatLng = L.latLng(position.lat, position.lng);
+
+      this.selectedToiletLatLng = L.latLng(
+        this.selectedToilet.lat,
+        this.selectedToilet.lon
+      );
+
+      if (this.userMarker) {
+        this.map.removeLayer(this.userMarker);
+      }
+
+      this.userMarker = L.marker(startLatLng, {
+        icon: L.icon({
+          iconUrl: '../../assets/toilet_marker.png',
+          iconSize: [60, 60],
+        }),
+      }).addTo(this.map);
+
+      this.startRouteLatLng = startLatLng;
+
+      this.calculateRoute(startLatLng, this.selectedToiletLatLng);
+    } catch (err) {
+      console.log('Position error', err);
+    }
   }
 }

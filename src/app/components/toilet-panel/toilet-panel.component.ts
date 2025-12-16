@@ -71,6 +71,7 @@ export class ToiletPanelComponent implements OnChanges {
   @Output() googleRoute = new EventEmitter<void>();
   @Output() downloadGpx = new EventEmitter<void>();
   @Output() TransportModeChange = new EventEmitter<string>();
+  @Output() startRouteFromCurrentLocation = new EventEmitter();
 
   onModeChange(event: MatRadioChange) {
     this.transportMode = event.value;
