@@ -1,23 +1,23 @@
 <mat-toolbar id="navbar">
-    <a href=""><img src="assets/toilet_marker.png" alt="logo"></a>
-    <span>Toilet Finder</span>
-    <mat-form-field>
-        <mat-label>Keresés</mat-label>
-        <input matInput placeholder="Település">
-    </mat-form-field>
+  <a href=""><img src="assets/toilet_marker.png" alt="logo" /></a>
+  <span>Toilet Finder</span>
+  <mat-form-field>
+    <mat-label>Keresés</mat-label>
+    <input matInput placeholder="Település" />
+  </mat-form-field>
+  <a mat-button *ngIf="isMapPage" (click)="selectNearestToilet()"
+    >Legközelebbi mosdó</a
+  >
 
-    <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
-        <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
+  <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
+    <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
+  </ng-container>
+
+  <ng-template #loginBlock>
+    <ng-container *ngIf="auth.user$ | async as user">
+      <a mat-button *ngIf="user.role === 'admin'" routerLink="/admin">Admin</a>
+      <a mat-button routerLink="/profile">Profil</a>
+      <button mat-button (click)="logout()">Kijelentkezés</button>
     </ng-container>
-
-    <ng-template #loginBlock>
-        <ng-container *ngIf="auth.user$ | async as user">
-            <a mat-button (click)="selectNearestToilet()">Legközelebbi mosdó</a>
-            <a mat-button *ngIf="user.role === 'admin' " routerLink="/admin">Admin</a>
-            <a mat-button routerLink="/profile">Profil</a>
-            <button mat-button (click)="logout()">Kijelentkezés</button>
-        </ng-container>
-    </ng-template>
-
-    
+  </ng-template>
 </mat-toolbar>

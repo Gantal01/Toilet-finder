@@ -2,11 +2,12 @@ import { Component, inject, OnInit, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { MapActionService } from '../services/map-action.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
@@ -24,8 +25,19 @@ import { MapActionService } from '../services/map-action.service';
   styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent {
-  constructor(public auth: AuthService, private router: Router, private mapAction: MapActionService) {}
+  isMapPage = false;
 
+  constructor(
+    public auth: AuthService,
+    private router: Router,
+    private mapAction: MapActionService
+  ) {
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e: NavigationEnd) => {
+        this.isMapPage = e.urlAfterRedirects === '/';
+      });
+  }
 
   loginWithGoogle() {
     this.auth.loginWithGoogle();
@@ -36,8 +48,7 @@ export class NavbarComponent {
     this.router.navigate(['']);
   }
 
-  selectNearestToilet(){
+  selectNearestToilet() {
     this.mapAction.triggerSelectNearestToilet();
   }
-
 }
