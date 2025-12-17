@@ -23,7 +23,24 @@
   </form>
   <button mat-button (click)="setNewNickname()">Mentés</button>
   <button mat-button (click)="formTriggerFunc()">Mégse</button>
-  <button mat-button (click)="removeNicskname()">Ninckname törlése</button>
+  <button mat-button (click)="removeNickname()">Ninckname törlése</button>
+</div>
+
+<div class="ratings-section">
+  <h4>Vélemények</h4>
+
+  <div class="ratings-list">
+    <div *ngFor="let rat of ratings">
+      <p>Név/id: {{ rat.toilet_id }}</p>
+      <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+      <app-star-rating [rating]="rat.value" [readonly]="true">
+      </app-star-rating>
+      <p>{{ rat.description }}</p>
+      <mat-divider></mat-divider>
+      <br>
+    </div>
+    <br />
+  </div>
 </div>
 
 <div *ngIf="!user">

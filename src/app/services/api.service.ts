@@ -53,4 +53,8 @@ export class ApiService {
     return this.http.get(`http://localhost:3000/toilet/nearest?lat=${lat}&lon=${lng}`);
   }
 
+  getRatingsByUserId(user_id: number): Observable<any>{
+    return this.http.get(`http://localhost:3000/ratings/${user_id}`)
+  }
+
 }

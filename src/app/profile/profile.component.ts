@@ -1,17 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { NgIf, } from '@angular/common';
-import { MatButton } from "@angular/material/button";
+import { NgIf, DatePipe, NgFor } from '@angular/common';
+import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import {FormsModule} from '@angular/forms';
-import {MatInputModule} from '@angular/material/input';
-import {AuthService} from '../services/auth.service';
-
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { AuthService } from '../services/auth.service';
+import { StarRatingComponent } from '../components/star-rating/star-rating.component';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [NgIf, MatButton, MatFormField, MatLabel, FormsModule, MatInputModule],
+  imports: [
+    NgIf,
+    MatButton,
+    MatFormField,
+    MatLabel,
+    FormsModule,
+    MatInputModule,
+    StarRatingComponent,
+    DatePipe,
+    NgFor,
+    MatDividerModule,
+  ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -20,66 +32,69 @@ export class ProfileComponent implements OnInit {
   user: any;
 
   formTrigger: boolean = false;
-  newNickname: string = "";
+  newNickname: string = '';
+
+  ratings: any[] = [];
 
   constructor(private api: ApiService, private auth: AuthService) {}
 
   ngOnInit(): void {
-  this.auth.user$.subscribe(user => {
-    if (!user || !user.user_id) return;
+    this.auth.user$.subscribe((user) => {
+      if (!user || !user.user_id) return;
 
-    this.userId = user.user_id;
+      this.userId = user.user_id;
 
-    this.api.getUserById(this.userId!).subscribe({
-      next: userData => this.user = userData,
-      error: err => console.error('API error', err)
+      this.api.getUserById(this.userId!).subscribe({
+        next: (userData) => (this.user = userData),
+        error: (err) => console.error('API error', err),
+      });
+
+      this.api.getRatingsByUserId(this.userId!).subscribe({
+        next: (rat) => {
+          this.ratings = rat;
+        },
+        error: (err) => console.error('API error', err),
+      });
     });
-  });
-}
+  }
 
- 
-
-  formTriggerFunc(){
-    if(!this.formTrigger){
+  formTriggerFunc() {
+    if (!this.formTrigger) {
       this.formTrigger = true;
-    }else{
+    } else {
       this.formTrigger = false;
     }
   }
 
-  setNewNickname(){
-    if(!this.newNickname || this.userId === null){
+  setNewNickname() {
+    if (!this.newNickname || this.userId === null) {
       return;
     }
-
 
     this.api.putNickname(this.newNickname, this.userId).subscribe({
-      next: (updatedUser) =>{
+      next: (updatedUser) => {
         this.user = updatedUser;
         this.formTrigger = false;
       },
-      error: err => {
+      error: (err) => {
         console.error('Nickname update error', err);
-      }
+      },
     });
   }
 
-
-  removeNicskname(){
-    if(this.userId === null){
+  removeNickname() {
+    if (this.userId === null) {
       return;
     }
 
-
-    this.api.removeNickname( this.userId).subscribe({
-      next: updatedUser =>{
+    this.api.removeNickname(this.userId).subscribe({
+      next: (updatedUser) => {
         this.user = updatedUser;
         this.formTrigger = false;
       },
-      error: err => {
+      error: (err) => {
         console.error('Nickname remove error', err);
-      }
+      },
     });
   }
-
 }

@@ -281,10 +281,41 @@ app.get('/toilet/nearest', async(req, res) => {
       res.json(result.rows[0]);
   }catch (err) {
     console.error("Database error", err);
-    res.status(500).json({message: "Database error"})
+    res.status(500).json({message: "Database error"});
   }
 
-})
+});
+
+app.get('/ratings/:user_id', passport.authenticate("jwt", { session: false }), async(req, res) =>{
+  const user_id = Number(req.params.user_id);
+
+  if(req.user.user_id !== user_id && req.user.role !== 'admin'){
+    return res.status(403).json({message: 'Forbidden'});
+  }
+
+  try{
+    const result = await pool.query(`      
+      SELECT
+      r.rating_id,
+      r.toilet_id,
+      r.value,
+      r.description,
+      r.creation_time,
+      t.name AS toilet_name,
+      t.osm_id
+      FROM ratings r
+      JOIN toilets t ON t.toilet_id = r.toilet_id
+      WHERE user_id = $1
+      ORDER BY creation_time DESC;
+      `, [user_id]);
+
+        res.json(result.rows);
+
+  }catch (err){
+    console.error('Database error', err);
+    res.status(500).json({message: 'Database error'});
+  }
+});
 
 
 app.listen(PORT, () => {
