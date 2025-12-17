@@ -202,10 +202,6 @@ export class MapComponent implements AfterViewInit {
               this.map.removeLayer(e.marker);
             }
           })
-          /*
-          .on('loaded', (e: any) => {
-            this.map.fitBounds(e.target.getBounds());
-          })*/
           .addTo(this.map);
       },
       error: (err) => console.error('Route fetch error', err),
@@ -286,7 +282,7 @@ export class MapComponent implements AfterViewInit {
 
       this.userMarker = L.marker(startLatLng, {
         icon: L.icon({
-          iconUrl: 'assets/toilet_marker.png',
+          iconUrl: 'assets/currentPosition.png',
           iconSize: [60, 60],
         }),
       }).addTo(this.map);
