@@ -12,6 +12,7 @@
 
     <ng-template #loginBlock>
         <ng-container *ngIf="auth.user$ | async as user">
+            <a mat-button (click)="selectNearestToilet()">Legközelebbi mosdó</a>
             <a mat-button *ngIf="user.role === 'admin' " routerLink="/admin">Admin</a>
             <a mat-button routerLink="/profile">Profil</a>
             <button mat-button (click)="logout()">Kijelentkezés</button>

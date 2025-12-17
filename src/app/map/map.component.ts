@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { ToiletPanelComponent } from '../components/toilet-panel/toilet-panel.component';
 import { LocationService } from '../services/location.service';
+import { MapActionService } from '../services/map-action.service';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -17,8 +18,6 @@ L.Icon.Default.mergeOptions({
   iconAnchor: [30, 60],
   popupAnchor: [0, -60],
 });
-
-
 
 @Component({
   selector: 'app-map',
@@ -40,12 +39,15 @@ export class MapComponent implements AfterViewInit {
 
   private lastGpxText: string | null = null;
 
-   private currentPosMarker!: L.Marker;
+  private currentPosMarker!: L.Marker;
 
   transportProfile: string = '';
 
-
-  
+  constructor(
+    private api: ApiService,
+    private locationService: LocationService,
+    private mapAction: MapActionService
+  ) {}
 
   onTransportModeChange(mode: string) {
     this.transportProfile = mode;
@@ -54,11 +56,6 @@ export class MapComponent implements AfterViewInit {
       this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
     }
   }
-
-  constructor(
-    private api: ApiService,
-    private locationService: LocationService
-  ) {}
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -111,13 +108,14 @@ export class MapComponent implements AfterViewInit {
       error: (err) => console.error(err),
     });
 
+    this.mapAction.selectNerestToilet$.subscribe(() => {
+      this.getNearestToilet();
+    });
 
-     this.currentPosition();
-
+    this.currentPosition();
   }
 
   private initMap(): void {
-
     const currentPos = this.locationService.getCurrentLocation();
 
     this.map = L.map('map', {
@@ -148,13 +146,12 @@ export class MapComponent implements AfterViewInit {
       this.userMarker = L.marker(e.latlng, { draggable: true }).addTo(this.map);
       this.calculateRoute(e.latlng, this.selectedToiletLatLng);
 
-
       this.userMarker.on('dragend', (event: L.LeafletEvent) => {
         const marker = event.target as L.Marker;
         const newPosition = marker.getLatLng();
         this.startRouteLatLng = newPosition;
         this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
-      })
+      });
 
       this.map.off('click', clickHandler);
     };
@@ -169,17 +166,16 @@ export class MapComponent implements AfterViewInit {
 
         this.lastGpxText = gpxText;
 
-          const startIcon = L.icon({
+        const startIcon = L.icon({
           iconUrl: 'assets/greenDot.png',
-          iconSize: [30,30],
-          iconAnchor: [10,10],  
-          });
-           const endIcon = L.icon({
+          iconSize: [30, 30],
+          iconAnchor: [10, 10],
+        });
+        const endIcon = L.icon({
           iconUrl: 'assets/redDot.png',
-          iconSize: [30,30],
-          iconAnchor: [10,10],  
-          });
-
+          iconSize: [30, 30],
+          iconAnchor: [10, 10],
+        });
 
         // @ts-ignore
         const newRouteLayer = new L.GPX(gpxText, {
@@ -303,27 +299,49 @@ export class MapComponent implements AfterViewInit {
     }
   }
 
-
   async currentPosition() {
-    try{
+    try {
       const position = await this.locationService.getCurrentLocation();
 
       const latlng = L.latLng(position.lat, position.lng);
 
-      if(this.currentPosMarker){
+      if (this.currentPosMarker) {
         this.map.removeLayer(this.currentPosMarker);
       }
-
 
       this.currentPosMarker = L.marker(latlng, {
         icon: L.icon({
           iconUrl: 'assets/currentPosition.png',
-          iconSize: [60,60]
+          iconSize: [60, 60],
         }),
       }).addTo(this.map);
-
-    }catch (err){
+    } catch (err) {
       console.log('Position error', err);
+    }
+  }
+
+  async getNearestToilet() {
+    try {
+      const position = await this.locationService.getCurrentLocation();
+
+      this.api.getNearestToilet(position.lat, position.lng).subscribe({
+        next: (nearest: any) => {
+          this.api.getToiletsById(nearest.toilet_id).subscribe({
+            next: (toilet) => {
+              this.selectedToilet = toilet;
+
+              this.selectedToiletLatLng = L.latLng(position.lat, position.lng);
+
+              this.map.setView(this.selectedToiletLatLng, 25);
+            },
+            error: (err) => console.error('Toilet details error', err),
+          });
+        },
+
+        error: (err) => console.error('Nearest toilet error', err),
+      });
+    } catch (err) {
+      console.error('Location error', err);
     }
   }
 }

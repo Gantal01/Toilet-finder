@@ -49,4 +49,8 @@ export class ApiService {
     return this.http.put(`http://localhost:3000/users/${userId}/nickname/remove`, {});
   }
 
+  getNearestToilet(lat: number, lng: number){
+    return this.http.get(`http://localhost:3000/toilet/nearest?lat=${lat}&lon=${lng}`);
+  }
+
 }

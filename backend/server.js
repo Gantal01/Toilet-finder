@@ -254,6 +254,39 @@ app.put(
   }
 );
 
+
+app.get('/toilet/nearest', async(req, res) => {
+  const {lat, lon} = req.query;
+
+  if(!lat || !lon){
+    return res.status(400).json({message: "Missig lat or lon"});
+  }
+
+
+  try{
+    const result = await pool.query(`
+      SELECT
+      toilet_id,
+      osm_id,
+      name,
+      ST_X(location::geometry) AS lon,
+      ST_Y(location::geometry) AS lat,
+      ST_DISTANCE(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
+      FROM toilets
+      WHERE osm_id IS NOT NULL OR approved = true
+      ORDER BY ST_Distance(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)
+      LIMIT 1;
+      `, [lon, lat]); 
+
+      res.json(result.rows[0]);
+  }catch (err) {
+    console.error("Database error", err);
+    res.status(500).json({message: "Database error"})
+  }
+
+})
+
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
