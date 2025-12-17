@@ -20,6 +20,7 @@ import {
 } from '@angular/material/radio';
 import { AuthService } from '../../services/auth.service';
 import {MatButtonModule} from '@angular/material/button';
+import {MatSlideToggle} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-toilet-panel',
@@ -36,7 +37,8 @@ import {MatButtonModule} from '@angular/material/button';
     MatRadioButton,
     MatRadioGroup,
     AsyncPipe,
-    MatButtonModule
+    MatButtonModule, 
+    MatSlideToggle
   ],
   templateUrl: './toilet-panel.component.html',
   styleUrl: './toilet-panel.component.scss',
@@ -50,6 +52,8 @@ export class ToiletPanelComponent implements OnChanges {
   description = '';
   transportMode: string = '';
   ratings: any[] = [];
+
+  isFromCurrent: boolean = false;
 
   constructor(private api: ApiService, public auth: AuthService) {}
 

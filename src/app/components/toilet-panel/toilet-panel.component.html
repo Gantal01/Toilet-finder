@@ -28,10 +28,21 @@
   </mat-radio-group>
   <br />
 
-  <button mat-button (click)="startRouteFromCurrentLocation.emit()">Útvonaltervezés jelengi pozíciótól</button>
-  <button mat-button (click)="startRoute.emit()">Útvonaltervezés</button><br />
-  <button mat-button (click)="googleRoute.emit()">Megnyitás Google Mapsben</button> <br />
-  <button mat-button (click)="downloadGpx.emit()">.gpx útvonal fájl letöltése</button
+  <button
+    mat-button
+    (click)="
+      isFromCurrent ? startRouteFromCurrentLocation.emit() : startRoute.emit()
+    "
+  >
+    Útvonaltervezés
+  </button>
+  <mat-slide-toggle [(ngModel)]="isFromCurrent"></mat-slide-toggle>Tartózkodási
+  helytől<br />
+  <button mat-button (click)="googleRoute.emit()">
+   Google Mapsben
+  </button>
+  <button mat-button (click)="downloadGpx.emit()">
+    .gpx fájl letöltése</button
   ><br />
   <br />
   <mat-divider></mat-divider>
