@@ -326,7 +326,7 @@ export class MapComponent implements AfterViewInit {
             next: (toilet) => {
               this.selectedToilet = toilet;
 
-              this.selectedToiletLatLng = L.latLng(position.lat, position.lng);
+              this.selectedToiletLatLng = L.latLng(nearest.lat, nearest.lon);
 
               this.map.setView(this.selectedToiletLatLng, 25);
             },
