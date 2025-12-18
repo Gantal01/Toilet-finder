@@ -8,6 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../services/auth.service';
 import { StarRatingComponent } from '../components/star-rating/star-rating.component';
 import { MatDividerModule } from '@angular/material/divider';
+import { Rating } from '../models/rating';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-profile',
@@ -36,7 +38,7 @@ export class ProfileComponent implements OnInit {
 
   editingRatingId: number | null = null;
 
-  ratings: any[] = [];
+  ratings: Rating[] = [];
 
   constructor(private api: ApiService, private auth: AuthService) {}
 
@@ -100,39 +102,35 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  deleteRating(ratingId: number){
-    if(!confirm("Biztosan törölni akarja a véleményét?")){
+  deleteRating(ratingId: number) {
+    if (!confirm('Biztosan törölni akarja a véleményét?')) {
       return;
-    };
-
+    }
 
     this.api.deleteRating(ratingId).subscribe({
-      next: () =>{
-        this.ratings = this.ratings.filter( r => r.rating_id !== ratingId);
-    },
-      error: err => console.error('Delete rating error', err),
-  });
-  }
-
-  modifyRating(rating_id: number){
-
-    this.editingRatingId = rating_id;
-
-  
-  }
-
-
-  cancelEditing(){
-    this.editingRatingId = null;
-  }
-
-  saveRating(rating: any){
-    this.api.putRating(rating.rating_id, rating.value, rating.description).subscribe({
-      next: () =>{
-        this.editingRatingId = null;
+      next: () => {
+        this.ratings = this.ratings.filter((r) => r.rating_id !== ratingId);
       },
-      error: err => console.error('Update rating error', err),
+      error: (err) => console.error('Delete rating error', err),
     });
   }
 
+  modifyRating(rating_id: number) {
+    this.editingRatingId = rating_id;
+  }
+
+  cancelEditing() {
+    this.editingRatingId = null;
+  }
+
+  saveRating(rating: Rating) {
+    this.api
+      .putRating(rating.rating_id, rating.value, rating.description)
+      .subscribe({
+        next: () => {
+          this.editingRatingId = null;
+        },
+        error: (err) => console.error('Update rating error', err),
+      });
+  }
 }

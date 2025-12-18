@@ -19,8 +19,10 @@ import {
   MatRadioGroup,
 } from '@angular/material/radio';
 import { AuthService } from '../../services/auth.service';
-import {MatButtonModule} from '@angular/material/button';
-import {MatSlideToggle} from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { Rating } from '../../models/rating';
+import { Toilet } from '../../models/toilet';
 
 @Component({
   selector: 'app-toilet-panel',
@@ -37,21 +39,21 @@ import {MatSlideToggle} from '@angular/material/slide-toggle';
     MatRadioButton,
     MatRadioGroup,
     AsyncPipe,
-    MatButtonModule, 
-    MatSlideToggle
+    MatButtonModule,
+    MatSlideToggle,
   ],
   templateUrl: './toilet-panel.component.html',
   styleUrl: './toilet-panel.component.scss',
 })
 export class ToiletPanelComponent implements OnChanges {
-  @Input() toilet: any | null = null;
+  @Input() toilet: Toilet | null = null;
 
   averageRating = 0;
   ratingCount = 0;
   userRating = 0;
   description = '';
   transportMode: string = '';
-  ratings: any[] = [];
+  ratings: Rating[] = [];
 
   isFromCurrent: boolean = false;
 
@@ -95,6 +97,8 @@ export class ToiletPanelComponent implements OnChanges {
       return;
     }
 
+    const toilet = this.toilet;
+
     this.api
       .postRating({
         toilet_id: this.toilet.toilet_id,
@@ -106,7 +110,7 @@ export class ToiletPanelComponent implements OnChanges {
           this.userRating = 0;
           this.description = '';
 
-          this.loadRatingAverage(this.toilet.toilet_id);
+          this.loadRatingAverage(toilet.toilet_id);
         },
         error: (err) => {
           if (err.status === 401) {

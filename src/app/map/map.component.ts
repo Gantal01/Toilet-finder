@@ -3,6 +3,9 @@ import { ApiService } from '../services/api.service';
 import { ToiletPanelComponent } from '../components/toilet-panel/toilet-panel.component';
 import { LocationService } from '../services/location.service';
 import { MapActionService } from '../services/map-action.service';
+import { ToiletList } from '../models/toilet-list';
+import { Toilet } from '../models/toilet';
+import { ToiletNearest } from '../models/toilet-nearest';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -30,7 +33,7 @@ L.Icon.Default.mergeOptions({
 export class MapComponent implements AfterViewInit {
   private map!: L.Map;
 
-  selectedToilet: any = null;
+  selectedToilet: Toilet | null = null;
 
   private userMarker!: L.Marker;
   private routeLayer!: any;
@@ -85,7 +88,7 @@ export class MapComponent implements AfterViewInit {
           iconSize: [60, 60],
         });
 
-        toilets.forEach((t: any) => {
+        toilets.forEach((t: ToiletList) => {
           if (t.lat && t.lon) {
             const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
 
@@ -321,7 +324,7 @@ export class MapComponent implements AfterViewInit {
       const position = await this.locationService.getCurrentLocation();
 
       this.api.getNearestToilet(position.lat, position.lng).subscribe({
-        next: (nearest: any) => {
+        next: (nearest: ToiletNearest) => {
           this.api.getToiletsById(nearest.toilet_id).subscribe({
             next: (toilet) => {
               this.selectedToilet = toilet;
