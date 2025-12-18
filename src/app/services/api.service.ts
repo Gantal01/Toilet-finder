@@ -57,4 +57,8 @@ export class ApiService {
     return this.http.get(`http://localhost:3000/ratings/${user_id}`)
   }
 
+  deleteRating(rating_id: number){
+    return this.http.delete(`http://localhost:3000/rating/${rating_id}/delete`);
+  }
+
 }

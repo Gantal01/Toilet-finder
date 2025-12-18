@@ -36,6 +36,8 @@
       <app-star-rating [rating]="rat.value" [readonly]="true">
       </app-star-rating>
       <p>{{ rat.description }}</p>
+
+      <button mat-button (click)="deleteRating(rat.rating_id)">Törlés</button>
       <mat-divider></mat-divider>
       <br>
     </div>

@@ -97,4 +97,19 @@ export class ProfileComponent implements OnInit {
       },
     });
   }
+
+  deleteRating(ratingId: number){
+    if(!confirm("Biztosan törölni akarja a véleményét?")){
+      return;
+    };
+
+
+    this.api.deleteRating(ratingId).subscribe({
+      next: () =>{
+        this.ratings = this.ratings.filter( r => r.rating_id !== ratingId);
+    },
+      error: err => console.error('Delete rating error', err),
+  });
+  }
+
 }

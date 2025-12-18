@@ -317,6 +317,33 @@ app.get('/ratings/:user_id', passport.authenticate("jwt", { session: false }), a
   }
 });
 
+app.delete('/rating/:rating_id/delete', passport.authenticate("jwt", { session: false }), async(req, res) =>{
+  const userID = req.user.user_id;
+  const isAdmin = req.user.role;
+  const ratingID = Number(req.params.rating_id);
+
+  try{
+    const result = await pool.query(`
+        DELETE FROM ratings
+        WHERE rating_id = $1
+        AND (user_id = $2 OR $3 = 'admin')
+        RETURNING rating_id;
+      
+      `, [ratingID,userID ,isAdmin]);
+
+      if(result.rowCount === 0){
+        return res.status(403).json({message: "Not authorized"});
+      }
+
+      res.json({message: 'Siekres törlés'})
+
+  }catch (err){
+    console.error("Databse error", err);
+    res.status(500).json({message: 'Database error'});
+  }
+
+})
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
