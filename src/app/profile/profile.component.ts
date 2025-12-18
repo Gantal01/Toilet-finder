@@ -34,6 +34,8 @@ export class ProfileComponent implements OnInit {
   formTrigger: boolean = false;
   newNickname: string = '';
 
+  editingRatingId: number | null = null;
+
   ratings: any[] = [];
 
   constructor(private api: ApiService, private auth: AuthService) {}
@@ -110,6 +112,27 @@ export class ProfileComponent implements OnInit {
     },
       error: err => console.error('Delete rating error', err),
   });
+  }
+
+  modifyRating(rating_id: number){
+
+    this.editingRatingId = rating_id;
+
+  
+  }
+
+
+  cancelEditing(){
+    this.editingRatingId = null;
+  }
+
+  saveRating(rating: any){
+    this.api.putRating(rating.rating_id, rating.value, rating.description).subscribe({
+      next: () =>{
+        this.editingRatingId = null;
+      },
+      error: err => console.error('Update rating error', err),
+    });
   }
 
 }

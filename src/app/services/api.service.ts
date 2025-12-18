@@ -61,4 +61,8 @@ export class ApiService {
     return this.http.delete(`http://localhost:3000/rating/${rating_id}/delete`);
   }
 
+  putRating(rating_id: number, value: number, description: string){
+    return this.http.put(`http://localhost:3000/rating/${rating_id}/update`,{value, description})
+  }
+
 }

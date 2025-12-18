@@ -344,6 +344,40 @@ app.delete('/rating/:rating_id/delete', passport.authenticate("jwt", { session: 
 
 })
 
+app.put(
+  "/rating/:rating_id/update",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const ratingID = Number(req.params.rating_id);
+    const {value, description }= req.body;
+    const userID = req.user.user_id;
+    const isAdmin = req.user.role;
+
+    try {
+      const result = await pool.query(
+        `
+            UPDATE ratings
+            SET value = $1, 
+            description = $2
+            WHERE rating_id = $3
+            AND (user_id = $4 OR $5 = 'admin')
+            RETURNING *`,
+        [value, description, ratingID, userID, isAdmin]
+      );
+
+      if(result.rowCount === 0){
+        return res.status(403).json({message: 'Not authorized'});
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  }
+);
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
