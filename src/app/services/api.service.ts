@@ -6,6 +6,7 @@ import { ToiletList } from '../models/toilet-list';
 import { Toilet } from '../models/toilet';
 import { User } from '../models/user';
 import { Rating } from '../models/rating';
+import {environment} from '../../environments/environment';
 
 
 @Injectable({
@@ -16,59 +17,59 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   getToilets(): Observable<ToiletList[]>{
-    return this.http.get<ToiletList[]>(`http://localhost:3000/toilets`);
+    return this.http.get<ToiletList[]>(`${environment.apiUrl}/toilets`);
   }
 
   getToiletsById(osm_id: number): Observable<Toilet>{
-    return this.http.get<Toilet>(`http://localhost:3000/toilets/${osm_id}`);
+    return this.http.get<Toilet>(`${environment.apiUrl}/toilets/${osm_id}`);
   }
 
   getRoute(start: {lat: number, lng: number}, end: {lat: number, lng: number}, profile: string): Observable<string>{
-    return this.http.post(`http://localhost:3000/route`, {start, end, profile}, {responseType: 'text'});
+    return this.http.post(`${environment.apiUrl}/route`, {start, end, profile}, {responseType: 'text'});
   }
 
   getUserById(user_id: number): Observable<User>{
-    return this.http.get<User>(`http://localhost:3000/profil/${user_id}`);
+    return this.http.get<User>(`${environment.apiUrl}/profil/${user_id}`);
   }
 
   getUsers(): Observable<User[]>{
-    return this.http.get<User[]>(`http://localhost:3000/users`)
+    return this.http.get<User[]>(`${environment.apiUrl}/users`)
   }
 
   getRatings(toilet_id: number): Observable<Rating[]>{
-    return this.http.get<Rating[]>(`http://localhost:3000/rating/${toilet_id}`);
+    return this.http.get<Rating[]>(`${environment.apiUrl}/rating/${toilet_id}`);
   }
 
   getRatingAverage(toilet_id: number): Observable<{average: number, count: number}>{
-    return this.http.get<{average: number, count: number}>(`http://localhost:3000/rating/average/${toilet_id}`);
+    return this.http.get<{average: number, count: number}>(`${environment.apiUrl}/rating/average/${toilet_id}`);
   }
 
   postRating(data: {toilet_id: number, value: number, description: string}): Observable<Rating> {
-    return this.http.post<Rating>(`http://localhost:3000/rating`, data)
+    return this.http.post<Rating>(`${environment.apiUrl}/rating`, data)
   }
 
   putNickname(nickname: string, userId: number){
-    return this.http.put(`http://localhost:3000/users/${userId}/nickname`, {nickname});
+    return this.http.put(`${environment.apiUrl}/users/${userId}/nickname`, {nickname});
   }
 
   removeNickname(userId: number){
-    return this.http.put(`http://localhost:3000/users/${userId}/nickname/remove`, {});
+    return this.http.put(`${environment.apiUrl}/users/${userId}/nickname/remove`, {});
   }
 
   getNearestToilet(lat: number, lng: number): Observable<ToiletNearest>{
-    return this.http.get<ToiletNearest>(`http://localhost:3000/toilet/nearest?lat=${lat}&lon=${lng}`);
+    return this.http.get<ToiletNearest>(`${environment.apiUrl}/toilet/nearest?lat=${lat}&lon=${lng}`);
   }
 
   getRatingsByUserId(user_id: number): Observable<any>{
-    return this.http.get(`http://localhost:3000/ratings/${user_id}`)
+    return this.http.get(`${environment.apiUrl}/ratings/${user_id}`)
   }
 
   deleteRating(rating_id: number): Observable<{messange: string}>{
-    return this.http.delete<{messange: string}>(`http://localhost:3000/rating/${rating_id}/delete`);
+    return this.http.delete<{messange: string}>(`${environment.apiUrl}/rating/${rating_id}/delete`);
   }
 
   putRating(rating_id: number, value: number, description: string | null): Observable<Rating>{
-    return this.http.put<Rating>(`http://localhost:3000/rating/${rating_id}/update`,{value, description})
+    return this.http.put<Rating>(`${environment.apiUrl}/rating/${rating_id}/update`,{value, description})
   }
 
 }
