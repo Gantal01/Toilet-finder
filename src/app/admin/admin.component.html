@@ -1,22 +1,90 @@
 <mat-tab-group>
   <mat-tab label="Felhasználók">
-    <div style="flex: 1">
-      <h2>Felhasználók:</h2>
-      <div *ngFor="let user of users">
-        <p>GoogleID: {{ user.google_id }}</p>
-        <p>Név: {{ user.name }}</p>
-        <p>Emial: {{ user.email }}</p>
-        <p>Szerepkör: {{ user.role }}</p>
+    <h2>Felhasználók:</h2>
+    <div class="nameContainer">
+      <mat-card>
+        <div class="listElement">
+          <div *ngFor="let user of users" class="listItem">
+            <mat-card (click)="setUser(user)">
+              <mat-card-content>
+                <p>Google ID: {{ user.google_id }}</p>
+                <p>Név: {{ user.name }}</p>
+              </mat-card-content>
+            </mat-card>
+            <br />
+          </div>
+        </div>
+      </mat-card>
+      <div *ngIf="selectedUser !== null">
+        <mat-card>
+          <mat-card-content>
+            <p>GoogleID: {{ selectedUser.google_id }}</p>
+            <p>Név: {{ selectedUser.name }}</p>
+            <p>Email: {{ selectedUser.email }}</p>
+            <p>Nickname: {{ selectedUser.nickname }}</p>
+            <p>Szerepkör: {{ selectedUser.role }}</p>
+            <p>Google ID: {{ selectedUser.google_id }}</p>
+            <mat-divider></mat-divider>
+            <br />
+            <h4>Felhasználó véleményei:</h4>
+            <div class="ratings-list">
+              <div *ngFor="let rat of userRatings">
+                <mat-card>
+                  <p>{{ rat.user_name }}</p>
+                  <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+                  <app-star-rating [rating]="rat.value" [readonly]="true">
+                  </app-star-rating>
+                  <p>{{ rat.description }}</p>
+                </mat-card>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <br />
       </div>
     </div>
   </mat-tab>
+
   <mat-tab label="Illemhelyek">
-    <h2 style="padding-left: 100px">Illemhelyek:</h2><br>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center">      
-      <div *ngFor="let toilet of toilets">
-        <p style="padding-left: 100px">ID: {{ toilet.osm_id }}</p>
+    <h2>Illemhelyek:</h2>
+    <div class="nameContainer">
+      <mat-card>
+        <div class="listElement">
+          <div *ngFor="let toilet of toilets" class="listItem">
+            <mat-card (click)="getToiletDetails(toilet.toilet_id)">
+              <mat-card-content>
+                <p>Toilet ID: {{ toilet.toilet_id }}</p>
+                <p>Toilet ID: {{ toilet.osm_id }}</p>
+              </mat-card-content>
+            </mat-card>
+            <br />
+          </div>
+        </div>
+      </mat-card>
+      <div *ngIf="slectedToilet !== null">
+        <mat-card>
+          <mat-card-content>
+            <p>GoogleID: {{ slectedToilet.access }}</p>
+            <p>Név: {{ slectedToilet.extra_info }}</p>
+            <p>Email: {{ slectedToilet.opening_hours }}</p>
+            <p>Nickname: {{ slectedToilet.lat }}</p>
+          </mat-card-content>
+          <h4>Vélemények az illemhelyről:</h4>
+          <div class="ratings-list">
+            <div *ngFor="let rat of toiletRatings">
+              <mat-card>
+                <p>{{ rat.user_name }}</p>
+                <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+                <app-star-rating [rating]="rat.value" [readonly]="true">
+                </app-star-rating>
+                <p>{{ rat.description }}</p>
+              </mat-card>
+            </div>
+          </div>
+        </mat-card>
+        <br />
       </div>
     </div>
   </mat-tab>
-  <mat-tab label = "Új javaslatok">Új javaslatok</mat-tab>
+  <mat-tab label="Új javaslatok">Új javaslatok</mat-tab>
 </mat-tab-group>

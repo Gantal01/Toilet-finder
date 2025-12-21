@@ -31,45 +31,42 @@
 
   <div class="ratings-list">
     <div *ngFor="let rat of ratings">
-
       <div *ngIf="editingRatingId !== rat.rating_id">
-          
         <p>Név/id: {{ rat.toilet_id }}</p>
         <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
         <app-star-rating [rating]="rat.value" [readonly]="true">
         </app-star-rating>
         <p>{{ rat.description }}</p>
 
-        <button mat-button (click)="modifyRating(rat.rating_id)">Módosítás</button>
+        <button mat-button (click)="modifyRating(rat.rating_id)">
+          Módosítás
+        </button>
         <button mat-button (click)="deleteRating(rat.rating_id)">Törlés</button>
 
         <mat-divider></mat-divider>
-      <br>
+        <br />
       </div>
-
 
       <div *ngIf="editingRatingId === rat.rating_id">
         <p>Név/id: {{ rat.toilet_id }}</p>
         <app-star-rating [(rating)]="rat.value"> </app-star-rating>
         <mat-form-field class="example-full-width">
-        <mat-label>Vélemeény módosítása</mat-label>
-        <textarea
-          matInput
-          placeholder="rat.description"
-          [(ngModel)]="rat.description"
-          name="description"
-        ></textarea>
-      </mat-form-field>
-      <br>
+          <mat-label>Vélemény módosítása</mat-label>
+          <textarea
+            matInput
+            placeholder="rat.description"
+            [(ngModel)]="rat.description"
+            name="description"
+          ></textarea>
+        </mat-form-field>
+        <br />
 
         <button mat-button (click)="cancelEditing()">Mégse</button>
         <button mat-button (click)="saveRating(rat)">Mentés</button>
 
         <mat-divider></mat-divider>
-      <br>
+        <br />
       </div>
-
-
     </div>
     <br />
   </div>

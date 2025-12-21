@@ -16,7 +16,7 @@ app.use(passport.initialize());
 app.use("/auth", authRoutes);
 
 app.get("/users", async (req, res) => {
-  const result = await pool.query(`SELECT * FROM users_old`);
+  const result = await pool.query(`SELECT * FROM users`);
 
   try {
     res.json(result.rows);

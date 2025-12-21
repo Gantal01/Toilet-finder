@@ -1,0 +1,32 @@
+.nameContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-basis: 400px;
+  justify-content: space-between;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.listElement {
+  overflow-y: auto;
+  max-height: 400px;
+}
+.listItem {
+  cursor: pointer;
+}
+
+.ratings-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.rating-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 0;
+}
+
+.rating-item:last-child {
+  border-bottom: none;
+}

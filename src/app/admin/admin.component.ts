@@ -1,41 +1,111 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { HttpClientModule } from "@angular/common/http";
-import { NgForOf } from "@angular/common";
-import { MatTabGroup, MatTabLabel, MatTab } from "@angular/material/tabs";
+import { HttpClientModule } from '@angular/common/http';
+import { NgForOf, NgIf, DatePipe } from '@angular/common';
+import {
+  MatTabGroup,
+  MatTabLabel,
+  MatTabsModule,
+} from '@angular/material/tabs';
+import { ToiletList } from '../models/toilet-list';
+import { User } from '../models/user';
+import { MatDivider } from '@angular/material/divider';
+import { MatCardModule, MatCardContent } from '@angular/material/card';
+import { Toilet } from '../models/toilet';
+import { StarRatingComponent } from '../components/star-rating/star-rating.component';
+import { Rating } from '../models/rating';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [HttpClientModule, NgForOf, MatTabGroup, MatTab],
-  providers: [ApiService],
+  imports: [
+    HttpClientModule,
+    NgForOf,
+    MatTabGroup,
+    MatTabsModule,
+    MatCardModule,
+    MatCardContent,
+    NgIf,
+    StarRatingComponent,
+    DatePipe,
+    MatDivider,
+  ],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.scss'
+  styleUrl: './admin.component.scss',
 })
-export class AdminComponent implements OnInit{
+export class AdminComponent implements OnInit {
+  toilets: ToiletList[] = [];
+  users: User[] = [];
+  selectedUser: User | null = null;
+  slectedToilet: Toilet | null = null;
+  userRatings: Rating[] | null = null;
+  toiletRatings: Rating[] | null = null;
 
-toilets: any[]= [];
-users: any[] = [];
+  constructor(private api: ApiService) {}
 
-constructor(private api: ApiService){}
-
-ngOnInit(): void {
+  ngOnInit(): void {
     this.api.getToilets().subscribe({
       next: (data) => {
         this.toilets = data;
       },
-    error: (err)=> console.error('APi error: ', err)
+      error: (err) => console.error('APi error: ', err),
     });
-
 
     this.api.getUsers().subscribe({
       next: (data) => {
         this.users = data;
       },
-      error: (err)=> console.error('APi error: ', err)
-
+      error: (err) => console.error('APi error: ', err),
     });
+  }
 
-}
+  getToiletDetails(toiletID: number) {
+    if (!this.slectedToilet || this.slectedToilet.toilet_id !== toiletID) {
+      this.api.getToiletsById(toiletID).subscribe({
+        next: (toilet) => {
+          this.slectedToilet = toilet;
+          this.getToiletRatings(this.slectedToilet.toilet_id);
+        },
+        error: (err) => console.error('API error', err),
+      });
+    } else {
+      this.closeToiletCard();
+    }
+  }
 
+  setUser(user: User) {
+    if (!this.selectedUser || user !== this.selectedUser) {
+      this.selectedUser = user;
+      this.getUserRatings(this.selectedUser.user_id);
+    } else {
+      this.closeUserCard();
+    }
+  }
+
+  closeUserCard() {
+    this.selectedUser = null;
+    this.userRatings = null;
+  }
+
+  closeToiletCard() {
+    this.slectedToilet = null;
+  }
+
+  getUserRatings(userID: number) {
+    this.api.getRatingsByUserId(userID).subscribe({
+      next: (ratings) => {
+        this.userRatings = ratings;
+      },
+      error: (err) => console.error('API error', err),
+    });
+  }
+
+  getToiletRatings(toiletID: number) {
+    this.api.getRatings(toiletID).subscribe({
+      next: (ratings) => {
+        this.toiletRatings = ratings;
+      },
+      error: (err) => console.error('API error', err),
+    });
+  }
 }

@@ -44,7 +44,7 @@ export class ApiService {
     return this.http.get<{average: number, count: number}>(`${environment.apiUrl}/rating/average/${toilet_id}`);
   }
 
-  postRating(data: {toilet_id: number, value: number, description: string}): Observable<Rating> {
+  postRating(data: {toilet_id: number, value: number, description: string | null}): Observable<Rating> {
     return this.http.post<Rating>(`${environment.apiUrl}/rating`, data)
   }
 
