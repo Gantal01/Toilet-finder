@@ -35,6 +35,9 @@
                   <app-star-rating [rating]="rat.value" [readonly]="true">
                   </app-star-rating>
                   <p>{{ rat.description }}</p>
+                  <button mat-button (click)="deleteRating(rat.rating_id)">
+                    Törlés
+                  </button>
                 </mat-card>
               </div>
             </div>
@@ -64,10 +67,37 @@
       <div *ngIf="slectedToilet !== null">
         <mat-card>
           <mat-card-content>
-            <p>GoogleID: {{ slectedToilet.access }}</p>
-            <p>Név: {{ slectedToilet.extra_info }}</p>
-            <p>Email: {{ slectedToilet.opening_hours }}</p>
-            <p>Nickname: {{ slectedToilet.lat }}</p>
+            <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
+            <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
+            <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
+            <p>Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}</p>
+            <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+            <p>
+              Nyitvatratás: {{ slectedToilet.opening_hours || "Nincs megadva" }}
+            </p>
+            <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
+            <p>Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}</p>
+            <p>
+              Mozgáskorlátozott:
+              {{ slectedToilet.wheelchair || "Nincs megadva" }}
+            </p>
+            <p>
+              Jóvágyaott: {{ slectedToilet.approved || "OSM adatbázidból" }}
+            </p>
+            <p>
+              Általa jóváhagyott:
+              {{ slectedToilet.aprroved_by || "OSM adatbázidból" }}
+            </p>
+            <p>
+              Álatala hozzáadva:
+              {{ slectedToilet.added_by || "OSM adatbázisból" }}
+            </p>
+            <div *ngIf="slectedToilet.extra_info as extra_info">
+              <p>További adatok:</p>
+              <div *ngFor="let key of Keys(extra_info)">
+                <p>{{ key }}: {{ extra_info[key] }}</p>
+              </div>
+            </div>
           </mat-card-content>
           <h4>Vélemények az illemhelyről:</h4>
           <div class="ratings-list">
@@ -78,6 +108,9 @@
                 <app-star-rating [rating]="rat.value" [readonly]="true">
                 </app-star-rating>
                 <p>{{ rat.description }}</p>
+                <button mat-button (click)="deleteRating(rat.rating_id)">
+                  Törlés
+                </button>
               </mat-card>
             </div>
           </div>

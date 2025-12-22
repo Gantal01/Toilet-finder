@@ -14,6 +14,7 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
 import { Toilet } from '../models/toilet';
 import { StarRatingComponent } from '../components/star-rating/star-rating.component';
 import { Rating } from '../models/rating';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-admin',
@@ -29,6 +30,7 @@ import { Rating } from '../models/rating';
     StarRatingComponent,
     DatePipe,
     MatDivider,
+    MatButton
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
@@ -38,8 +40,9 @@ export class AdminComponent implements OnInit {
   users: User[] = [];
   selectedUser: User | null = null;
   slectedToilet: Toilet | null = null;
-  userRatings: Rating[] | null = null;
-  toiletRatings: Rating[] | null = null;
+  userRatings: Rating[]  = [];
+  toiletRatings: Rating[]  = [];
+  Keys = Object.keys;
 
   constructor(private api: ApiService) {}
 
@@ -84,7 +87,7 @@ export class AdminComponent implements OnInit {
 
   closeUserCard() {
     this.selectedUser = null;
-    this.userRatings = null;
+    this.userRatings = [];
   }
 
   closeToiletCard() {
@@ -107,5 +110,30 @@ export class AdminComponent implements OnInit {
       },
       error: (err) => console.error('API error', err),
     });
+  }
+
+  deleteRating(ratingID: number) {
+
+    if(!confirm('Biztosan törölöd ezt a véleményt?')) {
+      return;
+    }
+
+    if (ratingID === this.selectedUser?.user_id) {
+      this.api.deleteRating(ratingID).subscribe({
+        next: () => {
+          this.userRatings = this.userRatings.filter(
+            (r) => r.rating_id !== ratingID
+          );
+        },
+      });
+    } else {
+      this.api.deleteRating(ratingID).subscribe({
+        next: () => {
+          this.toiletRatings = this.toiletRatings.filter(
+            (r) => r.rating_id !== ratingID
+          );
+        },
+      });
+    }
   }
 }
