@@ -414,20 +414,26 @@ app.post(
       return res.status(400).json({ message: "Lat/lon out of range" });
     }
 
-    let extreInfoJson = null;
+    let extraInfoJson = null;
 
-    const cleaned = {};
-    for (const [k, v] of Object.entries(extra_info)) {
-      if (typeof k !== "string") continue;
-      if (typeof v !== "string") continue;
-      const key = k.trim();
-      const val = v.trim();
-      if (!key || !val) continue;
-      cleaned[key] = val;
+    if (
+      extra_info &&
+      typeof extra_info === "object" &&
+      !Array.isArray(extra_info)
+    ) {
+      const cleaned = {};
+      for (const [k, v] of Object.entries(extra_info)) {
+        if (typeof k !== "string") continue;
+        if (typeof v !== "string") continue;
+        const key = k.trim();
+        const val = v.trim();
+        if (!key || !val) continue;
+        cleaned[key] = val;
+      }
+      extraInfoJson = Object.keys(cleaned).length
+        ? JSON.stringify(cleaned)
+        : null;
     }
-    extraInfoJson = Object.keys(cleaned).length
-      ? JSON.stringify(cleaned)
-      : null;
 
     try {
       const result = await pool.query(
@@ -504,9 +510,8 @@ app.post(
 );
 
 app.get("/newToilet", async (req, res) => {
-  
   try {
-  const result = await pool.query(`SELECT 
+    const result = await pool.query(`SELECT 
         toilet_id,
         osm_id,     
         ST_X(location::geometry) AS lon,    
@@ -514,7 +519,6 @@ app.get("/newToilet", async (req, res) => {
       FROM toilets
       WHERE osm_id IS NULL AND approved = false;`);
 
-  
     res.json(result.rows);
   } catch (err) {
     console.error("DB error", err);
@@ -562,7 +566,7 @@ app.put(
   async (req, res) => {
     const toiletID = Number(req.params.toilet_id);
     const userID = req.user.user_id;
-    
+
     if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
