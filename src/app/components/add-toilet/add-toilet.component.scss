@@ -1,0 +1,11 @@
+.infopanel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 95%;
+    padding: 20px;
+    background: white;
+    z-index: 1000;
+    overflow-y: auto;
+}

@@ -6,7 +6,8 @@ import { ToiletList } from '../models/toilet-list';
 import { Toilet } from '../models/toilet';
 import { User } from '../models/user';
 import { Rating } from '../models/rating';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
+import { PostToilet } from '../models/toilet-add';
 
 
 @Injectable({
@@ -70,6 +71,10 @@ export class ApiService {
 
   putRating(rating_id: number, value: number, description: string | null): Observable<Rating>{
     return this.http.put<Rating>(`${environment.apiUrl}/rating/${rating_id}/update`,{value, description})
+  }
+
+  postToilet(toilet: PostToilet): Observable<PostToilet>{
+    return this.http.post<PostToilet>(`${environment.apiUrl}/toilets/add`, toilet)
   }
 
 }

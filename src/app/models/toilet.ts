@@ -7,7 +7,7 @@ export interface Toilet {
   lat: number;
   lon: number;
   opening_hours: string | null;
-  aprroved_by: number | null;
+  approved_by: number | null;
   added_by: number | null;
   fee: boolean | null;
   wheelchair: boolean | null;

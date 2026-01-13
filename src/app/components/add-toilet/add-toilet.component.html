@@ -1,0 +1,61 @@
+<div class="infopanel">
+
+    <h2>Új mosdó hozzáadása</h2>
+
+  <p>Szélesség: {{ lat }}</p>
+  <p>Hosszúság: {{ lng }}</p>
+
+  <form>
+    <mat-form-field>
+      <mat-label>Mosdó elnevezése</mat-label>
+      <input matInput [(ngModel)]="name" name="name"/>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Üzemeltető</mat-label>
+      <input matInput [(ngModel)]="operator" name="operator" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Hozzáférhetőség</mat-label>
+      <input matInput [(ngModel)]="access" name="access"/>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Nyitvatartás</mat-label>
+      <input matInput [(ngModel)]="opening_hours" name="opening_hours"/> </mat-form-field
+    ><br />
+    <mat-slide-toggle [(ngModel)]="fee" name="fee">Díj</mat-slide-toggle><br />
+    <mat-slide-toggle [(ngModel)]="wheelchair" name="wheelchair"
+      >Mozgáskolátozott</mat-slide-toggle
+    >
+
+    <br>
+
+    <div *ngFor="let p of extraInfos; let i = index">
+
+        <p>Info {{i+1}}</p>
+
+        <mat-form-field>
+            <mat-label>Megnevezés</mat-label>
+            <input matInput [(ngModel)]="p.key" name= "extraKey{{i}}">
+        </mat-form-field>
+
+         <mat-form-field>
+            <mat-label>Érték</mat-label>
+            <input matInput [(ngModel)]="p.value" name= "extraValue{{i}}">
+        </mat-form-field>
+
+            <br>
+
+            <button mat-button type="button" (click)="removeExtraInfo(i)">Törlés</button>
+
+
+    </div>
+
+    <button mat-button type="button" (click)="addExtraInfo()" [disabled]="extraInfos.length >= maxNumExtraInfo ">További információ hozzáadása</button>
+
+
+
+  </form>
+
+  <button mat-button (click)="saveToilet()">Hozzáadás</button>
+  <button mat-button (click)="close.emit()">Mégse</button>
+</div>

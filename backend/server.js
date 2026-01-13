@@ -78,7 +78,7 @@ app.get("/toilets/:id", async (req, res) => {
 
 app.post("/route", async (req, res) => {
   const { start, end, profile } = req.body;
-  console.log('ROUTE BODY:', req.body);
+  console.log("ROUTE BODY:", req.body);
 
   try {
     const url = `http://localhost:17777/brouter?lonlats=${start.lng},${start.lat}|${end.lng},${end.lat}&format=gpx&profile=${profile}`;
@@ -255,17 +255,16 @@ app.put(
   }
 );
 
+app.get("/toilet/nearest", async (req, res) => {
+  const { lat, lon } = req.query;
 
-app.get('/toilet/nearest', async(req, res) => {
-  const {lat, lon} = req.query;
-
-  if(!lat || !lon){
-    return res.status(400).json({message: "Missig lat or lon"});
+  if (!lat || !lon) {
+    return res.status(400).json({ message: "Missig lat or lon" });
   }
 
-
-  try{
-    const result = await pool.query(`
+  try {
+    const result = await pool.query(
+      `
       SELECT
       toilet_id,
       osm_id,
@@ -277,25 +276,30 @@ app.get('/toilet/nearest', async(req, res) => {
       WHERE osm_id IS NOT NULL OR approved = true
       ORDER BY ST_Distance(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)
       LIMIT 1;
-      `, [lon, lat]); 
+      `,
+      [lon, lat]
+    );
 
-      res.json(result.rows[0]);
-  }catch (err) {
+    res.json(result.rows[0]);
+  } catch (err) {
     console.error("Database error", err);
-    res.status(500).json({message: "Database error"});
+    res.status(500).json({ message: "Database error" });
   }
-
 });
 
-app.get('/ratings/:user_id', passport.authenticate("jwt", { session: false }), async(req, res) =>{
-  const user_id = Number(req.params.user_id);
+app.get(
+  "/ratings/:user_id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const user_id = Number(req.params.user_id);
 
-  if(req.user.user_id !== user_id && req.user.role !== 'admin'){
-    return res.status(403).json({message: 'Forbidden'});
-  }
+    if (req.user.user_id !== user_id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
-  try{
-    const result = await pool.query(`      
+    try {
+      const result = await pool.query(
+        `      
       SELECT
       r.rating_id,
       r.toilet_id,
@@ -308,49 +312,56 @@ app.get('/ratings/:user_id', passport.authenticate("jwt", { session: false }), a
       JOIN toilets t ON t.toilet_id = r.toilet_id
       WHERE user_id = $1
       ORDER BY creation_time DESC;
-      `, [user_id]);
+      `,
+        [user_id]
+      );
 
-        res.json(result.rows);
-
-  }catch (err){
-    console.error('Database error', err);
-    res.status(500).json({message: 'Database error'});
+      res.json(result.rows);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
   }
-});
+);
 
-app.delete('/rating/:rating_id/delete', passport.authenticate("jwt", { session: false }), async(req, res) =>{
-  const userID = req.user.user_id;
-  const isAdmin = req.user.role;
-  const ratingID = Number(req.params.rating_id);
+app.delete(
+  "/rating/:rating_id/delete",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const userID = req.user.user_id;
+    const isAdmin = req.user.role;
+    const ratingID = Number(req.params.rating_id);
 
-  try{
-    const result = await pool.query(`
+    try {
+      const result = await pool.query(
+        `
         DELETE FROM ratings
         WHERE rating_id = $1
         AND (user_id = $2 OR $3 = 'admin')
         RETURNING rating_id;
       
-      `, [ratingID,userID ,isAdmin]);
+      `,
+        [ratingID, userID, isAdmin]
+      );
 
-      if(result.rowCount === 0){
-        return res.status(403).json({message: "Not authorized"});
+      if (result.rowCount === 0) {
+        return res.status(403).json({ message: "Not authorized" });
       }
 
-      res.json({message: 'Siekres törlés'})
-
-  }catch (err){
-    console.error("Databse error", err);
-    res.status(500).json({message: 'Database error'});
+      res.json({ message: "Siekres törlés" });
+    } catch (err) {
+      console.error("Databse error", err);
+      res.status(500).json({ message: "Database error" });
+    }
   }
-
-})
+);
 
 app.put(
   "/rating/:rating_id/update",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     const ratingID = Number(req.params.rating_id);
-    const {value, description }= req.body;
+    const { value, description } = req.body;
     const userID = req.user.user_id;
     const isAdmin = req.user.role;
 
@@ -366,8 +377,8 @@ app.put(
         [value, description, ratingID, userID, isAdmin]
       );
 
-      if(result.rowCount === 0){
-        return res.status(403).json({message: 'Not authorized'});
+      if (result.rowCount === 0) {
+        return res.status(403).json({ message: "Not authorized" });
       }
 
       res.json(result.rows[0]);
@@ -378,7 +389,119 @@ app.put(
   }
 );
 
+app.post(
+  "/toilets/add",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const user_id = req.user.user_id;
 
+    const {
+      name,
+      operator,
+      access,
+      lat,
+      lon,
+      opening_hours,
+      fee,
+      wheelchair,
+      extra_info,
+    } = req.body;
+
+    const latNum = Number(lat);
+    const lonNum = Number(lon);
+
+    if (latNum < -90 || latNum > 90 || lonNum < -180 || lonNum > 180) {
+      return res.status(400).json({ message: "Lat/lon out of range" });
+    }
+
+    let extreInfoJson = null;
+
+    const cleaned = {};
+    for (const [k, v] of Object.entries(extra_info)) {
+      if (typeof k !== "string") continue;
+      if (typeof v !== "string") continue;
+      const key = k.trim();
+      const val = v.trim();
+      if (!key || !val) continue;
+      cleaned[key] = val;
+    }
+    extraInfoJson = Object.keys(cleaned).length
+      ? JSON.stringify(cleaned)
+      : null;
+
+    try {
+      const result = await pool.query(
+        `
+        INSERT INTO toilets (
+          name,
+          operator,
+          access,
+          approved,
+          location,
+          opening_hours,
+          approved_by,
+          added_by,
+          fee,
+          wheelchair,
+          osm_id,
+          extra_info
+        )
+        VALUES (
+          $1,
+          $2,
+          $3,
+          false,
+          ST_SetSRID(ST_MakePoint($4, $5), 4326)::geography,
+          $6,
+          NULL,
+          $7,
+          $8,
+          $9,
+          NULL,
+          CASE
+           WHEN $10::jsonb IS NULL THEN NULL
+      ELSE (
+        SELECT hstore(array_agg(key), array_agg(value))
+        FROM jsonb_each_text($10::jsonb)
+      )
+          END
+        )
+        RETURNING
+          toilet_id,
+          name,
+          operator,
+          access,
+          approved,
+          added_by,
+          opening_hours,
+          fee,
+          wheelchair,
+          osm_id,
+          hstore_to_json(extra_info) AS extra_info,
+          ST_X(location::geometry) AS lon,
+          ST_Y(location::geometry) AS lat;
+        `,
+        [
+          name.trim(),
+          operator ?? null,
+          access ?? null,
+          lonNum,
+          latNum,
+          opening_hours ?? null,
+          user_id,
+          fee ?? null,
+          wheelchair ?? null,
+          extraInfoJson,
+        ]
+      );
+
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

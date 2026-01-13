@@ -1,18 +1,54 @@
 <div id="map-wrapper">
-    <div id="map"></div>
+  <div id="map"></div>
 
-    <app-toilet-panel
-        [toilet] = "selectedToilet"
-        (close) = "selectedToilet = null"
-        (startRoute) = "startRoute()"
-        (googleRoute) = "googleRoute()"
-        (downloadGpx) = "downloadGpx()"
-        (TransportModeChange) = "onTransportModeChange($event)"
-        (startRouteFromCurrentLocation) = "startRouteFromCurrentLocation()">
-    </app-toilet-panel>
+  <div class="mat-fabs">
+    <button
+      mat-fab
+      class="fab"
+      matTooltip="Legközelebbi mosdó"
+      (click)="getNearestToilet()"
+    >
+      <mat-icon>favicon</mat-icon>
+    </button>
+    <ng-container *ngIf="auth.isLoggedIn$ | async">
+      <button
+        mat-fab
+        class="fab"
+        matTooltip="Új mosdó hozzádás"
+        (click)="startAddToiletMode()"
+      >
+        <mat-icon>favicon</mat-icon>
+      </button>
+    </ng-container>
+  </div>
+
+  <app-toilet-panel
+    [toilet]="selectedToilet"
+    (close)="selectedToilet = null"
+    (startRoute)="startRoute()"
+    (googleRoute)="googleRoute()"
+    (downloadGpx)="downloadGpx()"
+    (TransportModeChange)="onTransportModeChange($event)"
+    (startRouteFromCurrentLocation)="startRouteFromCurrentLocation()"
+  >
+  </app-toilet-panel>
+
+  <div class="center-crosshair" *ngIf="addToiletMode"></div>
+
+<div class="add-bar" *ngIf="isPickingPosition">
+    <button mat-button (click)="confirmPosition()">Pozíció jóváhagyása</button>
+    <button mat-button (click)="cancelAdding()">Mégse</button>
 </div>
 
-
+  <app-add-toilet
+  *ngIf="addToiletLatLng && !isPickingPosition && addToiletMode"
+  [lat]="addToiletLatLng.lat"
+  [lng]="addToiletLatLng.lng"
+  (close) = "cancelAdding()"
+  (save) = "saveToilet()"
+  >
+  </app-add-toilet>
+</div>
 
 <!--
 <div class="infopanel" *ngIf="selectedToilet">
