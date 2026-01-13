@@ -21,8 +21,8 @@ export class ApiService {
     return this.http.get<ToiletList[]>(`${environment.apiUrl}/toilets`);
   }
 
-  getToiletsById(osm_id: number): Observable<Toilet>{
-    return this.http.get<Toilet>(`${environment.apiUrl}/toilets/${osm_id}`);
+  getToiletsById(toilet_id: number): Observable<Toilet>{
+    return this.http.get<Toilet>(`${environment.apiUrl}/toilets/${toilet_id}`);
   }
 
   getRoute(start: {lat: number, lng: number}, end: {lat: number, lng: number}, profile: string): Observable<string>{
@@ -77,4 +77,15 @@ export class ApiService {
     return this.http.post<PostToilet>(`${environment.apiUrl}/toilets/add`, toilet)
   }
 
+  getNewToilets(): Observable<ToiletList[]>{
+    return this.http.get<ToiletList[]>(`${environment.apiUrl}/newToilet`);
+  }
+
+   getNewToiletsById(toilet_id: number): Observable<Toilet>{
+    return this.http.get<Toilet>(`${environment.apiUrl}/newToilets/${toilet_id}`);
+  }
+
+  putToiletApprove(toilet_id: number): Observable<Rating>{
+    return this.http.put<Rating>(`${environment.apiUrl}/toilet/${toilet_id}/approve`, {})
+  }
 }

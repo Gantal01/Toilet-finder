@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group (selectedTabChange)="onTabChange($event)">
   <mat-tab label="Felhasználók">
     <h2>Felhasználók:</h2>
     <div class="nameContainer">
@@ -57,7 +57,7 @@
             <mat-card (click)="getToiletDetails(toilet.toilet_id)">
               <mat-card-content>
                 <p>Toilet ID: {{ toilet.toilet_id }}</p>
-                <p>Toilet ID: {{ toilet.osm_id }}</p>
+                <p>OSM ID: {{ toilet.osm_id }}</p>
               </mat-card-content>
             </mat-card>
             <br />
@@ -119,5 +119,60 @@
       </div>
     </div>
   </mat-tab>
-  <mat-tab label="Új javaslatok">Új javaslatok</mat-tab>
+  <mat-tab label="Új javaslatok">
+  <div class="nameContainer">
+      <mat-card>
+        <div class="listElement">
+          <div *ngFor="let toilet of newToilets" class="listItem">
+            <mat-card (click)="getNewToiletDetails(toilet.toilet_id)">
+              <mat-card-content>
+                <p>Toilet ID: {{ toilet.toilet_id }}</p>
+              </mat-card-content>
+            </mat-card>
+            <br />
+          </div>
+        </div>
+      </mat-card>
+      <div *ngIf="slectedToilet !== null">
+        <mat-card>
+          <mat-card-content>
+            <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
+            <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
+            <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
+            <p>Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}</p>
+            <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+            <p>
+              Nyitvatratás: {{ slectedToilet.opening_hours || "Nincs megadva" }}
+            </p>
+            <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
+            <p>Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}</p>
+            <p>
+              Mozgáskorlátozott:
+              {{ slectedToilet.wheelchair || "Nincs megadva" }}
+            </p>
+            <p>
+              Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}
+            </p>
+            <p>
+              Általa jóváhagyott:
+              {{ slectedToilet.approved_by || "OSM adatbázidból" }}
+            </p>
+            <p>
+              Álatala hozzáadva:
+              {{ slectedToilet.added_by || "OSM adatbázisból" }}
+            </p>
+            <div *ngIf="slectedToilet.extra_info as extra_info">
+              <p>További adatok:</p>
+              <div *ngFor="let key of Keys(extra_info)">
+                <p>{{ key }}: {{ extra_info[key] }}</p>
+              </div>
+            </div>
+
+            <button mat-button (click)="approveToilet(slectedToilet.toilet_id)">Jóváhagyás</button>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+  </div>
+  </mat-tab>
 </mat-tab-group>

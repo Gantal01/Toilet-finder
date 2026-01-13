@@ -4,8 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgForOf, NgIf, DatePipe } from '@angular/common';
 import {
   MatTabGroup,
-  MatTabLabel,
   MatTabsModule,
+  MatTabChangeEvent
 } from '@angular/material/tabs';
 import { ToiletList } from '../models/toilet-list';
 import { User } from '../models/user';
@@ -42,11 +42,13 @@ export class AdminComponent implements OnInit {
   slectedToilet: Toilet | null = null;
   userRatings: Rating[]  = [];
   toiletRatings: Rating[]  = [];
+  newToilets: ToiletList[] = [];
   Keys = Object.keys;
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
+
     this.api.getToilets().subscribe({
       next: (data) => {
         this.toilets = data;
@@ -60,6 +62,8 @@ export class AdminComponent implements OnInit {
       },
       error: (err) => console.error('APi error: ', err),
     });
+
+    this.getNewToilets();
   }
 
   getToiletDetails(toiletID: number) {
@@ -136,4 +140,49 @@ export class AdminComponent implements OnInit {
       });
     }
   }
+
+
+ getNewToiletDetails(toiletID: number) {
+    if (!this.slectedToilet || this.slectedToilet.toilet_id !== toiletID) {
+      this.api.getNewToiletsById(toiletID).subscribe({
+        next: (toilet) => {
+          this.slectedToilet = toilet;
+        },
+        error: (err) => console.error('API error', err),
+      });
+    } else {
+      this.closeToiletCard();
+    }
+  }
+
+  approveToilet(toilet_id: number){
+    this.api.putToiletApprove(toilet_id).subscribe({
+      next: () => {
+        this.getNewToilets();
+        this.slectedToilet = null;
+      },
+      error: (err) => console.error('API error', err), 
+    });
+  }
+
+
+
+  getNewToilets(){
+    this.api.getNewToilets().subscribe({
+      next: (data) => {
+        this.newToilets = data;
+      },
+      error: (err) => console.error('APi error: ', err),
+    });
+  }
+
+
+
+  onTabChange(event: MatTabChangeEvent){
+    this.selectedUser = null;
+    this.slectedToilet = null;
+    this.userRatings = [];
+    this.toiletRatings = [];
+  }
+
 }

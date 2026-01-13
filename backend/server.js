@@ -503,6 +503,93 @@ app.post(
   }
 );
 
+app.get("/newToilet", async (req, res) => {
+  
+  try {
+  const result = await pool.query(`SELECT 
+        toilet_id,
+        osm_id,     
+        ST_X(location::geometry) AS lon,    
+        ST_Y(location::geometry) AS lat
+      FROM toilets
+      WHERE osm_id IS NULL AND approved = false;`);
+
+  
+    res.json(result.rows);
+  } catch (err) {
+    console.error("DB error", err);
+    res.status(500).send("Database error");
+  }
+});
+
+app.get("/newToilets/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `
+        SELECT
+        toilet_id,
+        osm_id, 
+        name,
+        operator,
+        access, 
+        opening_hours,
+        wheelchair,
+        fee,
+        hstore_to_json(extra_info) AS extra_info,
+        ST_X(location::geometry) AS lon,    
+        ST_Y(location::geometry) AS lat
+      FROM toilets
+      WHERE toilet_id = $1;
+        `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Toilet not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("DB error", err);
+    res.status(500).send("Database error");
+  }
+});
+
+app.put(
+  "/toilet/:toilet_id/approve",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const toiletID = Number(req.params.toilet_id);
+    const userID = req.user.user_id;
+    
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    try {
+      const result = await pool.query(
+        `
+            UPDATE toilets
+            SET approved = true,
+            approved_by = $2 
+            WHERE toilet_id = $1
+            RETURNING toilet_id, approved, approved_by`,
+        [toiletID, userID]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Toilet not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  }
+);
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
