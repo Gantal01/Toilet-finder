@@ -84,6 +84,21 @@
     <button mat-button (click)="submitRating()" [disabled]="userRating === 0">
       Küldés</button
     ><br />
+      <mat-divider></mat-divider>
+      <h4>Módosítási javaslat</h4>
+     <form class="example-form">
+      <mat-form-field class="example-full-width">
+        <mat-label>Módosítási javaslat</mat-label>
+        <textarea
+          matInput
+          placeholder="Írd le a módosítási javaslatod!"
+          [(ngModel)]="suggestion"
+          name="suggestion"
+        ></textarea>
+      </mat-form-field>
+    </form>
+    <button mat-button (click)="submitSuggestion()">
+      Küldés</button>
   </div>
 
   <ng-template #loginRequired>

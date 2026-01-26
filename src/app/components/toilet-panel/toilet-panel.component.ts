@@ -54,6 +54,7 @@ export class ToiletPanelComponent implements OnChanges {
   description = '';
   transportMode: string = '';
   ratings: Rating[] = [];
+  suggestion = '';
 
   isFromCurrent: boolean = false;
 
@@ -111,6 +112,30 @@ export class ToiletPanelComponent implements OnChanges {
           this.description = '';
 
           this.loadRatingAverage(toilet.toilet_id);
+        },
+        error: (err) => {
+          if (err.status === 401) {
+            alert('Csak bejelentkezve értékelhetsz');
+          }
+        },
+      });
+  }
+
+   submitSuggestion() {
+    if (!this.toilet) {
+      return;
+    }
+
+    const toilet = this.toilet;
+
+    this.api
+      .postSuggestion({
+        toilet_id: this.toilet.toilet_id,
+        suggestion: this.suggestion,
+      })
+      .subscribe({
+        next: () => {
+          this.suggestion = '';
         },
         error: (err) => {
           if (err.status === 401) {

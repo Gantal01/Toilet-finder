@@ -15,6 +15,7 @@ import { Toilet } from '../models/toilet';
 import { StarRatingComponent } from '../components/star-rating/star-rating.component';
 import { Rating } from '../models/rating';
 import { MatButton } from '@angular/material/button';
+import { Suggestion } from '../models/suggestion';
 
 @Component({
   selector: 'app-admin',
@@ -44,6 +45,8 @@ export class AdminComponent implements OnInit {
   toiletRatings: Rating[]  = [];
   newToilets: ToiletList[] = [];
   Keys = Object.keys;
+  suggestions: Suggestion[] = [];
+  selectedSuggestion: Suggestion | null = null;
 
   constructor(private api: ApiService) {}
 
@@ -59,6 +62,13 @@ export class AdminComponent implements OnInit {
     this.api.getUsers().subscribe({
       next: (data) => {
         this.users = data;
+      },
+      error: (err) => console.error('APi error: ', err),
+    });
+
+    this.api.getNewSuggestions().subscribe({
+      next: (data) => {
+        this.suggestions = data;
       },
       error: (err) => console.error('APi error: ', err),
     });
@@ -183,6 +193,11 @@ export class AdminComponent implements OnInit {
     this.slectedToilet = null;
     this.userRatings = [];
     this.toiletRatings = [];
+    this.selectedSuggestion = null;
+  }
+
+  setSuggestion(suggestion: Suggestion){
+    this.selectedSuggestion = suggestion;
   }
 
 }

@@ -35,17 +35,17 @@
 
   <div class="center-crosshair" *ngIf="addToiletMode"></div>
 
-<div class="add-bar" *ngIf="isPickingPosition">
+  <div class="add-bar" *ngIf="isPickingPosition">
     <button mat-button (click)="confirmPosition()">Pozíció jóváhagyása</button>
     <button mat-button (click)="cancelAdding()">Mégse</button>
-</div>
+  </div>
 
   <app-add-toilet
-  *ngIf="addToiletLatLng && !isPickingPosition && addToiletMode"
-  [lat]="addToiletLatLng.lat"
-  [lng]="addToiletLatLng.lng"
-  (close) = "cancelAdding()"
-  (save) = "saveToilet()"
+    *ngIf="addToiletLatLng && !isPickingPosition && addToiletMode"
+    [lat]="addToiletLatLng.lat"
+    [lng]="addToiletLatLng.lng"
+    (close)="cancelAdding()"
+    (save)="saveToilet()"
   >
   </app-add-toilet>
 </div>

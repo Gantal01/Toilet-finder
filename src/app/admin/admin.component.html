@@ -175,4 +175,29 @@
       </div>
   </div>
   </mat-tab>
+  <mat-tab label="Módosítási javaslatok">
+    <h2>Módosítási javaslatok:</h2>
+    <div class="nameContainer">
+      <mat-card>
+        <div class="listElement">
+          <div *ngFor="let suggestion of suggestions" class="listItem">
+            <mat-card (click)="setSuggestion(suggestion)">
+              <mat-card-content>
+                <p>Suggestion ID: {{ suggestion.suggestion_id }}</p>
+              </mat-card-content>
+            </mat-card>
+            <br />
+          </div>
+        </div>
+      </mat-card>
+      <div *ngIf="selectedSuggestion !== null">
+        <mat-card>
+          <mat-card-content>
+            <p>Suggestion ID: {{ selectedSuggestion.suggestion_id }}</p>
+<p>Javasolta: {{ selectedSuggestion.user_id }}</p>
+<p>Időpont: {{ selectedSuggestion.creation_time | date : "yyyy. MM. dd." }}</p>
+<p>Javaslat: {{ selectedSuggestion.description }}</p>
+          </mat-card-content>
+        </mat-card></div></div>
+  </mat-tab>
 </mat-tab-group>

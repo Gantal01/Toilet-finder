@@ -8,6 +8,7 @@ import { User } from '../models/user';
 import { Rating } from '../models/rating';
 import { environment } from '../../environments/environment';
 import { PostToilet } from '../models/toilet-add';
+import { Suggestion } from '../models/suggestion';
 
 
 @Injectable({
@@ -81,11 +82,19 @@ export class ApiService {
     return this.http.get<ToiletList[]>(`${environment.apiUrl}/newToilet`);
   }
 
-   getNewToiletsById(toilet_id: number): Observable<Toilet>{
+  getNewToiletsById(toilet_id: number): Observable<Toilet>{
     return this.http.get<Toilet>(`${environment.apiUrl}/newToilets/${toilet_id}`);
   }
 
   putToiletApprove(toilet_id: number): Observable<Rating>{
     return this.http.put<Rating>(`${environment.apiUrl}/toilet/${toilet_id}/approve`, {})
+  }
+
+  postSuggestion(data: {toilet_id: number, suggestion: string | null}): Observable<Rating> {
+    return this.http.post<Rating>(`${environment.apiUrl}/suggestion`, data)
+  }
+
+  getNewSuggestions(): Observable<Suggestion[]>{
+      return this.http.get<Suggestion[]>(`${environment.apiUrl}/suggestions`)
   }
 }

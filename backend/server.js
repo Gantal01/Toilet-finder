@@ -594,6 +594,52 @@ app.put(
   }
 );
 
+app.post(
+  "/suggestion",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { toilet_id, suggestion } = req.body;
+    const user_id = req.user.user_id;
+
+    try {
+      const result = await pool.query(
+        `
+            INSERT INTO suggestions (user_id, toilet_id, description)
+            VALUES ($1, $2, $3)
+            RETURNING suggestion_id, toilet_id, description, creation_time;
+            `,
+        [user_id, toilet_id, suggestion]
+      );
+
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+     
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  }
+);
+
+app.get("/suggestions", async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT 
+        toilet_id,
+        user_id,     
+        suggestion_id,
+        description,
+        creation_time,
+        status
+      FROM suggestions
+      WHERE status = 'pending';
+      `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("DB error", err);
+    res.status(500).send("Database error");
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
