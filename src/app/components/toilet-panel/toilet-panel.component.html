@@ -1,11 +1,12 @@
 <div class="infopanel" *ngIf="toilet">
-  <button (click)="close.emit()">X</button>
+  <button mat-button (click)="close.emit()">X</button>
 
   <h4>Illemehely adatai</h4>
 
   <app-star-rating [rating]="averageRating" [readonly]="true">
   </app-star-rating>
   <p>{{ ratingCount }} értékelés</p>
+  <button mat-button (click)="openMap.emit()">Google maps</button>
 
   <p>Név: {{ toilet.name || "Nincs megadva" }}</p>
   <p>OSM_ID: {{ toilet.osm_id || "Nincs megadva" }}</p>

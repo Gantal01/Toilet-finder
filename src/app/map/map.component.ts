@@ -239,10 +239,10 @@ export class MapComponent implements AfterViewInit {
           })
           .addTo(this.map);
       },
-      error: (err) => {console.error('Route fetch error', err);
+      error: (err) => {
+        console.error('Route fetch error', err);
         this.calcRoute = false;
       },
-      
     });
   }
 
@@ -444,4 +444,9 @@ export class MapComponent implements AfterViewInit {
     return { distanceKm, durationMin };
   }
 
+  openMap() {
+    const googleUrl = `https://www.google.com/maps/search/?api=1&query=${this.selectedToilet?.lat}%2C${this.selectedToilet?.lon}`;
+
+    window.open(googleUrl, '_blank');
+  }
 }
