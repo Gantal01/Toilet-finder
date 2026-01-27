@@ -6,16 +6,18 @@ import { MapActionService } from '../services/map-action.service';
 import { ToiletList } from '../models/toilet-list';
 import { Toilet } from '../models/toilet';
 import { ToiletNearest } from '../models/toilet-nearest';
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatTooltipModule } from "@angular/material/tooltip";
-import {AuthService} from '../services/auth.service';
-import {AsyncPipe, NgIf} from '@angular/common';
-import {AddToiletComponent} from '../components/add-toilet/add-toilet.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../services/auth.service';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { AddToiletComponent } from '../components/add-toilet/add-toilet.component';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet-gpx';
+import GPX from 'leaflet-gpx';
+import { DummyLoginProvider } from '@abacritt/angularx-social-login';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -31,7 +33,15 @@ L.Icon.Default.mergeOptions({
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [ToiletPanelComponent, MatButtonModule, MatTooltipModule, MatIconModule, NgIf, AsyncPipe, AddToiletComponent],
+  imports: [
+    ToiletPanelComponent,
+    MatButtonModule,
+    MatTooltipModule,
+    MatIconModule,
+    NgIf,
+    AsyncPipe,
+    AddToiletComponent,
+  ],
   providers: [ApiService],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
@@ -56,11 +66,15 @@ export class MapComponent implements AfterViewInit {
   addToiletLatLng: L.LatLng | null = null;
   isPickingPosition: boolean = false;
 
+  distance: number | null = null;
+  time: number | null = null;
+  calcRoute: boolean = false;
+
   constructor(
     private api: ApiService,
     private locationService: LocationService,
     private mapAction: MapActionService,
-    public auth: AuthService
+    public auth: AuthService,
   ) {}
 
   onTransportModeChange(mode: string) {
@@ -149,7 +163,7 @@ export class MapComponent implements AfterViewInit {
 
     this.selectedToiletLatLng = L.latLng(
       this.selectedToilet.lat,
-      this.selectedToilet.lon
+      this.selectedToilet.lon,
     );
 
     const clickHandler = (e: L.LeafletMouseEvent) => {
@@ -177,6 +191,13 @@ export class MapComponent implements AfterViewInit {
     this.api.getRoute(start, end, this.transportProfile).subscribe({
       next: (gpxText: string) => {
         console.log('gpx', gpxText);
+
+        this.calcRoute = true;
+
+        const stats = this.extractStats(gpxText);
+
+        this.distance = stats.distanceKm ?? 0;
+        this.time = stats.durationMin ?? 0;
 
         this.lastGpxText = gpxText;
 
@@ -218,7 +239,10 @@ export class MapComponent implements AfterViewInit {
           })
           .addTo(this.map);
       },
-      error: (err) => console.error('Route fetch error', err),
+      error: (err) => {console.error('Route fetch error', err);
+        this.calcRoute = false;
+      },
+      
     });
   }
 
@@ -287,7 +311,7 @@ export class MapComponent implements AfterViewInit {
 
       this.selectedToiletLatLng = L.latLng(
         this.selectedToilet.lat,
-        this.selectedToilet.lon
+        this.selectedToilet.lon,
       );
 
       if (this.userMarker) {
@@ -355,45 +379,69 @@ export class MapComponent implements AfterViewInit {
     }
   }
 
-
-  startAddToiletMode(){
+  startAddToiletMode() {
     this.selectedToilet = null;
     this.addToiletLatLng = null;
     this.addToiletMode = true;
-    this.isPickingPosition =true;
+    this.isPickingPosition = true;
 
-    const mapElement = document.getElementById("map");
-    if(mapElement) mapElement.style.cursor = "crosshair";
-
+    const mapElement = document.getElementById('map');
+    if (mapElement) mapElement.style.cursor = 'crosshair';
   }
 
-    cancelAddToiletMode(){
+  cancelAddToiletMode() {
     this.addToiletMode = false;
 
-    const mapElement = document.getElementById("map");
-    if(mapElement) mapElement.style.cursor = "";
-
+    const mapElement = document.getElementById('map');
+    if (mapElement) mapElement.style.cursor = '';
   }
 
-  cancelAdding(){
+  cancelAdding() {
     this.addToiletMode = false;
     this.isPickingPosition = false;
     this.addToiletLatLng = null;
 
-    const mapElement = document.getElementById("map");
-    if(mapElement) mapElement.style.cursor = "";
+    const mapElement = document.getElementById('map');
+    if (mapElement) mapElement.style.cursor = '';
   }
 
-
-  confirmPosition(){
+  confirmPosition() {
     const position = this.map.getCenter();
     this.addToiletLatLng = L.latLng(position.lat, position.lng);
 
     this.isPickingPosition = false;
   }
 
-  saveToilet(){
+  saveToilet() {
     this.cancelAdding();
+  }
+
+  private extractStats(gpx: string): {
+    distanceKm?: number;
+    durationMin?: number;
+  } {
+    const commentMatch = gpx.match(/<!--([\s\S]*?)-->/);
+    if (!commentMatch) return {};
+
+    const comment = commentMatch[1];
+
+    const distanceMatch = comment.match(/track-length\s*=\s*([0-9]+)/i);
+    const distanceKm = distanceMatch
+      ? Number(distanceMatch[1]) / 1000
+      : undefined;
+
+    const timeMatch = comment.match(
+      /time\s*=\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?/i,
+    );
+    let durationMin: number | undefined;
+    if (timeMatch) {
+      const h = Number(timeMatch[1] ?? 0);
+      const m = Number(timeMatch[2] ?? 0);
+      const s = Number(timeMatch[3] ?? 0);
+      durationMin = h * 60 + m + s / 60;
+    }
+
+    return { distanceKm, durationMin };
   }
 
 }

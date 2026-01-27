@@ -24,6 +24,9 @@
 
   <app-toilet-panel
     [toilet]="selectedToilet"
+    [calculatedRoute]="calcRoute"
+    [time]="time"
+    [distance]="distance"
     (close)="selectedToilet = null"
     (startRoute)="startRoute()"
     (googleRoute)="googleRoute()"

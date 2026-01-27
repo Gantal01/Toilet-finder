@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:3000/auth/google/callback",
 },
 
-async (asccesToken, refreshToken, profile, done) => {
+async (accesToken, refreshToken, profile, done) => {
     try{
        
 

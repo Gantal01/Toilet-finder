@@ -38,14 +38,16 @@
   </button>
   <mat-slide-toggle [(ngModel)]="isFromCurrent"></mat-slide-toggle>Tartózkodási
   helytől<br />
-  <button mat-button (click)="googleRoute.emit()">
-   Google Mapsben
-  </button>
-  <button mat-button (click)="downloadGpx.emit()">
-    .gpx fájl letöltése</button
-  ><br />
-  <br />
-  <mat-divider></mat-divider>
+  <div *ngIf="routePanel">
+    <br />
+    <p>{{ time }} perc, {{ distance }} km</p>
+    <button mat-button (click)="googleRoute.emit()">Google Mapsben</button>
+    <button mat-button (click)="downloadGpx.emit()">.gpx fájl letöltése</button
+    ><br />
+    <br />
+    <mat-divider></mat-divider>
+  </div>
+
   <br />
 
   <div class="ratings-section">
@@ -54,7 +56,7 @@
     <div class="ratings-list">
       <div *ngFor="let rat of ratings">
         <p>{{ rat.user_name }}</p>
-        <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+        <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
         <app-star-rating [rating]="rat.value" [readonly]="true">
         </app-star-rating>
         <p>{{ rat.description }}</p>
@@ -84,9 +86,9 @@
     <button mat-button (click)="submitRating()" [disabled]="userRating === 0">
       Küldés</button
     ><br />
-      <mat-divider></mat-divider>
-      <h4>Módosítási javaslat</h4>
-     <form class="example-form">
+    <mat-divider></mat-divider>
+    <h4>Módosítási javaslat</h4>
+    <form class="example-form">
       <mat-form-field class="example-full-width">
         <mat-label>Módosítási javaslat</mat-label>
         <textarea
@@ -97,8 +99,7 @@
         ></textarea>
       </mat-form-field>
     </form>
-    <button mat-button (click)="submitSuggestion()">
-      Küldés</button>
+    <button mat-button (click)="submitSuggestion()">Küldés</button>
   </div>
 
   <ng-template #loginRequired>

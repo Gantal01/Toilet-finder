@@ -47,6 +47,9 @@ import { Toilet } from '../../models/toilet';
 })
 export class ToiletPanelComponent implements OnChanges {
   @Input() toilet: Toilet | null = null;
+  @Input() distance: number | null = null;
+  @Input() time: number | null = null;
+  @Input() calculatedRoute: boolean = false;
 
   averageRating = 0;
   ratingCount = 0;
@@ -55,6 +58,7 @@ export class ToiletPanelComponent implements OnChanges {
   transportMode: string = '';
   ratings: Rating[] = [];
   suggestion = '';
+  routePanel: boolean = false;
 
   isFromCurrent: boolean = false;
 
@@ -70,6 +74,14 @@ export class ToiletPanelComponent implements OnChanges {
         },
         error: (err) => console.error('API error', err),
       });
+    }
+
+    if(changes['calculatedRoute']){
+        if(this.calculatedRoute){
+          this.routePanel = true;
+        }else{
+          this.routePanel = false;
+        }
     }
   }
 
