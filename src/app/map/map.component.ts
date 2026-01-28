@@ -17,7 +17,6 @@ import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet-gpx';
 import GPX from 'leaflet-gpx';
-import { DummyLoginProvider } from '@abacritt/angularx-social-login';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -59,6 +58,9 @@ export class MapComponent implements AfterViewInit {
   private lastGpxText: string | null = null;
 
   private currentPosMarker!: L.Marker;
+
+  private readonly MIN_ZOOM = 15;
+  private prevZoom: number | null = null;
 
   transportProfile: string = '';
 
@@ -380,32 +382,34 @@ export class MapComponent implements AfterViewInit {
   }
 
   startAddToiletMode() {
+    this.lockZoomForPicking();
     this.selectedToilet = null;
     this.addToiletLatLng = null;
     this.addToiletMode = true;
     this.isPickingPosition = true;
 
     const mapElement = document.getElementById('map');
-    if (mapElement) mapElement.style.cursor = 'crosshair';
   }
 
   cancelAddToiletMode() {
     this.addToiletMode = false;
+    this.mapInteraction(true);
 
     const mapElement = document.getElementById('map');
-    if (mapElement) mapElement.style.cursor = '';
   }
 
   cancelAdding() {
+    this.unlockZoom();
+    this.mapInteraction(true);
     this.addToiletMode = false;
     this.isPickingPosition = false;
     this.addToiletLatLng = null;
 
     const mapElement = document.getElementById('map');
-    if (mapElement) mapElement.style.cursor = '';
   }
 
   confirmPosition() {
+    this.mapInteraction(false);
     const position = this.map.getCenter();
     this.addToiletLatLng = L.latLng(position.lat, position.lng);
 
@@ -448,5 +452,52 @@ export class MapComponent implements AfterViewInit {
     const googleUrl = `https://www.google.com/maps/search/?api=1&query=${this.selectedToilet?.lat}%2C${this.selectedToilet?.lon}`;
 
     window.open(googleUrl, '_blank');
+  }
+
+  private lockZoomForPicking() {
+    this.prevZoom = this.map.getMinZoom();
+
+    if (this.map.getZoom() < this.MIN_ZOOM) {
+      this.map.setZoom(this.MIN_ZOOM);
+    }
+
+    this.map.setMinZoom(this.MIN_ZOOM);
+  }
+
+  private unlockZoom() {
+    if (this.prevZoom !== null) {
+      this.map.setMinZoom(this.prevZoom);
+      this.prevZoom = null;
+    }
+  }
+
+  private mapInteraction(enable: boolean) {
+    if (!this.map) {
+      return;
+    }
+
+    if (enable) {
+      this.map.dragging.enable();
+      this.map.touchZoom.enable();
+      this.map.doubleClickZoom.enable();
+      this.map.scrollWheelZoom.enable();
+      this.map.boxZoom.enable();
+      this.map.keyboard.enable();
+
+      if ((this.map as any).tap) {
+        (this.map as any).tap.enable();
+      }
+    } else {
+      this.map.dragging.disable();
+      this.map.touchZoom.disable();
+      this.map.doubleClickZoom.disable();
+      this.map.scrollWheelZoom.disable();
+      this.map.boxZoom.disable();
+      this.map.keyboard.disable();
+
+      if ((this.map as any).tap) {
+        (this.map as any).tap.disable();
+      }
+    }
   }
 }

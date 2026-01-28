@@ -1,23 +1,25 @@
 <div id="map-wrapper">
   <div id="map"></div>
 
-  <div class="mat-fabs">
+  <div class="mat-fabs" *ngIf="!isPickingPosition && !addToiletMode">
     <button
       mat-fab
+      color="white"
       class="fab"
       matTooltip="Legközelebbi mosdó"
       (click)="getNearestToilet()"
     >
-      <mat-icon>favicon</mat-icon>
+      <img src="assets/toilet_marker.png" width="50" height="50" />
     </button>
     <ng-container *ngIf="auth.isLoggedIn$ | async">
       <button
         mat-fab
+        color="white"
         class="fab"
         matTooltip="Új mosdó hozzádás"
         (click)="startAddToiletMode()"
       >
-        <mat-icon>favicon</mat-icon>
+       <img src="assets/toilet_marker.png" width="50" height="50" />
       </button>
     </ng-container>
   </div>
