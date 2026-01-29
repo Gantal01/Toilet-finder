@@ -20,7 +20,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { A11yModule } from '@angular/cdk/a11y';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-admin',
@@ -42,7 +42,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
     A11yModule,
     FormsModule,
     MatInputModule,
-    MatSlideToggle,
+    MatSlideToggleModule,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
@@ -208,17 +208,6 @@ export class AdminComponent implements OnInit {
     this.api.getToiletsById(suggestion.toilet_id).subscribe({
       next: (toilet) => {
         this.slectedToilet = toilet;
-
-        this.editToilet = {
-          name: toilet.name ?? null,
-          operator: toilet.operator ?? null,
-          access: toilet.access ?? '',
-          opening_hours: toilet.opening_hours ?? null,
-          fee: toilet.fee ?? null,
-          wheelchair: toilet.wheelchair ?? null,
-        };
-
-        this.extraInfoText = JSON.stringify(toilet.extra_info ?? {}, null, 2);
       },
       error: (err) => console.error('API error', err),
     });
@@ -230,9 +219,13 @@ export class AdminComponent implements OnInit {
     } else {
       this.modifyTrigger = true;
     }
+
+    if(this.modifyTrigger){
+      this.initEditToilet();
+    }
   }
 
-  putToiletData() {
+  putToiletDataSuggestoins() {
     if (!this.slectedToilet || !this.selectedSuggestion) {
       return;
     }
@@ -294,5 +287,51 @@ export class AdminComponent implements OnInit {
         },
         error: (err) => console.error(err),
       });
+  }
+
+  putToiletData() {
+    if (!this.slectedToilet) {
+      return;
+    }
+
+    let extraObj: any = {};
+    try {
+      extraObj = JSON.parse(this.extraInfoText || '{}');
+    } catch {
+      alert('Hibás extrainfo!');
+      return;
+    }
+
+    const payload = {
+      ...this.editToilet,
+      extra_info: extraObj,
+    };
+
+    this.api.patchToilet(this.slectedToilet.toilet_id, payload).subscribe({
+      next: (updatetedToilet) => {
+        this.slectedToilet = updatetedToilet;
+        this.modifyTrigger = false;
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+
+  initEditToilet(){
+
+    if(!this.slectedToilet){
+      return;
+    }
+
+    this.editToilet = {
+          name: this.slectedToilet.name ?? null,
+          operator: this.slectedToilet.operator ?? null,
+          access: this.slectedToilet.access ?? null,
+          opening_hours: this.slectedToilet.opening_hours ?? null,
+          fee: this.slectedToilet.fee ?? null,
+          wheelchair: this.slectedToilet.wheelchair ?? null,
+        };
+
+        this.extraInfoText = JSON.stringify(this.slectedToilet.extra_info ?? {}, null, 2);
   }
 }

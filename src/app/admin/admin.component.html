@@ -51,7 +51,7 @@
   <mat-tab label="Illemhelyek">
     <h2>Illemhelyek:</h2>
     <div class="nameContainer">
-      <mat-card>
+      <mat-card *ngIf="!modifyTrigger">
         <div class="listElement">
           <div *ngFor="let toilet of toilets" class="listItem">
             <mat-card (click)="getToiletDetails(toilet.toilet_id)">
@@ -65,7 +65,7 @@
         </div>
       </mat-card>
       <div *ngIf="slectedToilet !== null">
-        <mat-card>
+        <mat-card *ngIf="!modifyTrigger">
           <mat-card-content>
             <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
             <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
@@ -99,8 +99,9 @@
               </div>
             </div>
           </mat-card-content>
+          <button mat-button (click)="setModifyTrigger()">Módosítás</button>
           <h4>Vélemények az illemhelyről:</h4>
-          <div class="ratings-list">
+          <div class="ratings-list" *ngIf="!modifyTrigger">
             <div *ngFor="let rat of toiletRatings">
               <mat-card>
                 <p>{{ rat.user_name }}</p>
@@ -114,6 +115,73 @@
               </mat-card>
             </div>
           </div>
+        </mat-card>
+        <mat-card *ngIf="modifyTrigger">
+          <mat-card-content>
+            <form class="example-form" (ngSubmit)="putToiletData()">
+              <mat-form-field class="example-full-width">
+                <mat-label>Név:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.name"
+                  placeholder= "{{slectedToilet.name}}"
+                  name="name"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Üzemeltető:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.operator"
+                  placeholder="{{slectedToilet.operator}}"
+                  name="operator"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Hozzáférés:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.access"
+                  placeholder="{{slectedToilet.access}}"
+                  name="access"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Nyitvatartás:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.opening_hours"
+                  placeholder="{{slectedToilet.opening_hours}}"
+                  name="openinghours"
+                />
+              </mat-form-field>
+
+              <mat-slide-toggle [(ngModel)]="editToilet.fee" name="fee">
+                Használati díj
+              </mat-slide-toggle>
+
+              <mat-slide-toggle
+                [(ngModel)]="editToilet.wheelchair"
+                name="wheelchair"
+              >
+                Mozgáskorlátozott
+              </mat-slide-toggle>
+
+              <mat-form-field class="example-full-width">
+                <mat-label>Extra információ:</mat-label>
+                <textarea
+                  matInput
+                  rows="2"
+                  [(ngModel)]="extraInfoText"
+                  name="extraInfoText"
+                ></textarea>
+              </mat-form-field>
+              <button mat-button type="submit">Mentés</button>
+              <button mat-button type="button" (click)="setModifyTrigger()">
+                Mégse
+              </button>
+            </form>
+          </mat-card-content>
         </mat-card>
         <br />
       </div>
@@ -240,7 +308,7 @@
         </mat-card>
         <mat-card *ngIf="modifyTrigger">
           <mat-card-content>
-            <form class="example-form" (ngSubmit)="putToiletData()">
+            <form class="example-form" (ngSubmit)="putToiletDataSuggestoins()">
               <mat-form-field class="example-full-width">
                 <mat-label>Név:</mat-label>
                 <input
