@@ -31,7 +31,7 @@
               <div *ngFor="let rat of userRatings">
                 <mat-card>
                   <p>{{ rat.user_name }}</p>
-                  <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+                  <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
                   <app-star-rating [rating]="rat.value" [readonly]="true">
                   </app-star-rating>
                   <p>{{ rat.description }}</p>
@@ -104,7 +104,7 @@
             <div *ngFor="let rat of toiletRatings">
               <mat-card>
                 <p>{{ rat.user_name }}</p>
-                <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
+                <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
                 <app-star-rating [rating]="rat.value" [readonly]="true">
                 </app-star-rating>
                 <p>{{ rat.description }}</p>
@@ -120,7 +120,7 @@
     </div>
   </mat-tab>
   <mat-tab label="Új javaslatok">
-  <div class="nameContainer">
+    <div class="nameContainer">
       <mat-card>
         <div class="listElement">
           <div *ngFor="let toilet of newToilets" class="listItem">
@@ -150,9 +150,7 @@
               Mozgáskorlátozott:
               {{ slectedToilet.wheelchair || "Nincs megadva" }}
             </p>
-            <p>
-              Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}
-            </p>
+            <p>Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
             <p>
               Általa jóváhagyott:
               {{ slectedToilet.approved_by || "OSM adatbázidból" }}
@@ -168,12 +166,13 @@
               </div>
             </div>
 
-            <button mat-button (click)="approveToilet(slectedToilet.toilet_id)">Jóváhagyás</button>
-
+            <button mat-button (click)="approveToilet(slectedToilet.toilet_id)">
+              Jóváhagyás
+            </button>
           </mat-card-content>
         </mat-card>
       </div>
-  </div>
+    </div>
   </mat-tab>
   <mat-tab label="Módosítási javaslatok">
     <h2>Módosítási javaslatok:</h2>
@@ -194,10 +193,119 @@
         <mat-card>
           <mat-card-content>
             <p>Suggestion ID: {{ selectedSuggestion.suggestion_id }}</p>
-<p>Javasolta: {{ selectedSuggestion.user_id }}</p>
-<p>Időpont: {{ selectedSuggestion.creation_time | date : "yyyy. MM. dd." }}</p>
-<p>Javaslat: {{ selectedSuggestion.description }}</p>
+            <p>Javasolta: {{ selectedSuggestion.user_id }}</p>
+            <p>
+              Időpont:
+              {{ selectedSuggestion.creation_time | date: "yyyy. MM. dd." }}
+            </p>
+            <p>Javaslat: {{ selectedSuggestion.description }}</p>
+            <button mat-button (click)="rejectSuggestion()">Elutasítás</button>
           </mat-card-content>
-        </mat-card></div></div>
+        </mat-card>
+      </div>
+      <div *ngIf="slectedToilet !== null">
+        <mat-card *ngIf="!modifyTrigger">
+          <mat-card-content>
+            <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
+            <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
+            <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
+            <p>Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}</p>
+            <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+            <p>
+              Nyitvatratás: {{ slectedToilet.opening_hours || "Nincs megadva" }}
+            </p>
+            <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
+            <p>Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}</p>
+            <p>
+              Mozgáskorlátozott:
+              {{ slectedToilet.wheelchair || "Nincs megadva" }}
+            </p>
+            <p>Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
+            <p>
+              Általa jóváhagyott:
+              {{ slectedToilet.approved_by || "OSM adatbázidból" }}
+            </p>
+            <p>
+              Álatala hozzáadva:
+              {{ slectedToilet.added_by || "OSM adatbázisból" }}
+            </p>
+            <div *ngIf="slectedToilet.extra_info as extra_info">
+              <p>További adatok:</p>
+              <div *ngFor="let key of Keys(extra_info)">
+                <p>{{ key }}: {{ extra_info[key] }}</p>
+              </div>
+            </div>
+            <button mat-button (click)="setModifyTrigger()">Módosítás</button>
+          </mat-card-content>
+        </mat-card>
+        <mat-card *ngIf="modifyTrigger">
+          <mat-card-content>
+            <form class="example-form" (ngSubmit)="putToiletData()">
+              <mat-form-field class="example-full-width">
+                <mat-label>Név:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.name"
+                  placeholder="selectedToilet.name"
+                  name="name"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Üzemeltető:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.operator"
+                  placeholder="slectedToilet.operator"
+                  name="operator"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Hozzáférés:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.access"
+                  placeholder="slectedToilet.access"
+                  name="access"
+                />
+              </mat-form-field>
+              <mat-form-field class="example-full-width">
+                <mat-label>Nyitvatartás:</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="editToilet.opening_hours"
+                  placeholder="slectedToilet.opening_hours"
+                  name="openinghours"
+                />
+              </mat-form-field>
+
+              <mat-slide-toggle [(ngModel)]="editToilet.fee" name="fee">
+                Használati díj
+              </mat-slide-toggle>
+
+              <mat-slide-toggle
+                [(ngModel)]="editToilet.wheelchair"
+                name="wheelchair"
+              >
+                Mozgáskorlátozott
+              </mat-slide-toggle>
+
+              <mat-form-field class="example-full-width">
+                <mat-label>Extra információ:</mat-label>
+                <textarea
+                  matInput
+                  rows="2"
+                  [(ngModel)]="extraInfoText"
+                  name="extraInfoText"
+                ></textarea>
+              </mat-form-field>
+              <button mat-button type="submit">Mentés</button>
+              <button mat-button type="button" (click)="setModifyTrigger()">
+                Mégse
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
   </mat-tab>
 </mat-tab-group>

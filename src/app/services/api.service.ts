@@ -97,4 +97,12 @@ export class ApiService {
   getNewSuggestions(): Observable<Suggestion[]>{
       return this.http.get<Suggestion[]>(`${environment.apiUrl}/suggestions`)
   }
+
+  patchToilet(toilet_id: number, payload: any): Observable<Toilet>{
+    return this.http.patch<Toilet>(`${environment.apiUrl}/toiletsUpdate/${toilet_id}`, payload)
+  }
+
+  postSuggestionResolve(suggestion_id: number, status: 'approved' | 'rejected'){
+    return this.http.post(`${environment.apiUrl}/suggestion/${suggestion_id}/resolve`, {status})
+  }
 }

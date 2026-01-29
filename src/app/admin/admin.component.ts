@@ -5,7 +5,7 @@ import { NgForOf, NgIf, DatePipe } from '@angular/common';
 import {
   MatTabGroup,
   MatTabsModule,
-  MatTabChangeEvent
+  MatTabChangeEvent,
 } from '@angular/material/tabs';
 import { ToiletList } from '../models/toilet-list';
 import { User } from '../models/user';
@@ -16,6 +16,11 @@ import { StarRatingComponent } from '../components/star-rating/star-rating.compo
 import { Rating } from '../models/rating';
 import { MatButton } from '@angular/material/button';
 import { Suggestion } from '../models/suggestion';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { A11yModule } from '@angular/cdk/a11y';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-admin',
@@ -31,7 +36,13 @@ import { Suggestion } from '../models/suggestion';
     StarRatingComponent,
     DatePipe,
     MatDivider,
-    MatButton
+    MatButton,
+    MatFormField,
+    MatLabel,
+    A11yModule,
+    FormsModule,
+    MatInputModule,
+    MatSlideToggle,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
@@ -41,17 +52,19 @@ export class AdminComponent implements OnInit {
   users: User[] = [];
   selectedUser: User | null = null;
   slectedToilet: Toilet | null = null;
-  userRatings: Rating[]  = [];
-  toiletRatings: Rating[]  = [];
+  userRatings: Rating[] = [];
+  toiletRatings: Rating[] = [];
   newToilets: ToiletList[] = [];
   Keys = Object.keys;
   suggestions: Suggestion[] = [];
   selectedSuggestion: Suggestion | null = null;
+  modifyTrigger: boolean = false;
+  editToilet: any = null;
+  extraInfoText: string = '';
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-
     this.api.getToilets().subscribe({
       next: (data) => {
         this.toilets = data;
@@ -127,8 +140,7 @@ export class AdminComponent implements OnInit {
   }
 
   deleteRating(ratingID: number) {
-
-    if(!confirm('Biztosan törölöd ezt a véleményt?')) {
+    if (!confirm('Biztosan törölöd ezt a véleményt?')) {
       return;
     }
 
@@ -136,7 +148,7 @@ export class AdminComponent implements OnInit {
       this.api.deleteRating(ratingID).subscribe({
         next: () => {
           this.userRatings = this.userRatings.filter(
-            (r) => r.rating_id !== ratingID
+            (r) => r.rating_id !== ratingID,
           );
         },
       });
@@ -144,15 +156,14 @@ export class AdminComponent implements OnInit {
       this.api.deleteRating(ratingID).subscribe({
         next: () => {
           this.toiletRatings = this.toiletRatings.filter(
-            (r) => r.rating_id !== ratingID
+            (r) => r.rating_id !== ratingID,
           );
         },
       });
     }
   }
 
-
- getNewToiletDetails(toiletID: number) {
+  getNewToiletDetails(toiletID: number) {
     if (!this.slectedToilet || this.slectedToilet.toilet_id !== toiletID) {
       this.api.getNewToiletsById(toiletID).subscribe({
         next: (toilet) => {
@@ -165,19 +176,17 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  approveToilet(toilet_id: number){
+  approveToilet(toilet_id: number) {
     this.api.putToiletApprove(toilet_id).subscribe({
       next: () => {
         this.getNewToilets();
         this.slectedToilet = null;
       },
-      error: (err) => console.error('API error', err), 
+      error: (err) => console.error('API error', err),
     });
   }
 
-
-
-  getNewToilets(){
+  getNewToilets() {
     this.api.getNewToilets().subscribe({
       next: (data) => {
         this.newToilets = data;
@@ -186,9 +195,7 @@ export class AdminComponent implements OnInit {
     });
   }
 
-
-
-  onTabChange(event: MatTabChangeEvent){
+  onTabChange(event: MatTabChangeEvent) {
     this.selectedUser = null;
     this.slectedToilet = null;
     this.userRatings = [];
@@ -196,8 +203,96 @@ export class AdminComponent implements OnInit {
     this.selectedSuggestion = null;
   }
 
-  setSuggestion(suggestion: Suggestion){
+  setSuggestion(suggestion: Suggestion) {
     this.selectedSuggestion = suggestion;
+    this.api.getToiletsById(suggestion.toilet_id).subscribe({
+      next: (toilet) => {
+        this.slectedToilet = toilet;
+
+        this.editToilet = {
+          name: toilet.name ?? null,
+          operator: toilet.operator ?? null,
+          access: toilet.access ?? '',
+          opening_hours: toilet.opening_hours ?? null,
+          fee: toilet.fee ?? null,
+          wheelchair: toilet.wheelchair ?? null,
+        };
+
+        this.extraInfoText = JSON.stringify(toilet.extra_info ?? {}, null, 2);
+      },
+      error: (err) => console.error('API error', err),
+    });
   }
 
+  setModifyTrigger() {
+    if (this.modifyTrigger) {
+      this.modifyTrigger = false;
+    } else {
+      this.modifyTrigger = true;
+    }
+  }
+
+  putToiletData() {
+    if (!this.slectedToilet || !this.selectedSuggestion) {
+      return;
+    }
+
+    let extraObj: any = {};
+    try {
+      extraObj = JSON.parse(this.extraInfoText || '{}');
+    } catch {
+      alert('Hibás extrainfo!');
+      return;
+    }
+
+    const payload = {
+      ...this.editToilet,
+      extra_info: extraObj,
+    };
+
+    this.api.patchToilet(this.slectedToilet.toilet_id, payload).subscribe({
+      next: (updatetedToilet) => {
+        this.slectedToilet = updatetedToilet;
+
+        this.api
+          .postSuggestionResolve(
+            this.selectedSuggestion!.suggestion_id,
+            'approved',
+          )
+          .subscribe({
+            next: () => {
+              this.suggestions = this.suggestions.filter(
+                (s) =>
+                  s.suggestion_id !== this.selectedSuggestion!.suggestion_id,
+              );
+
+              this.selectedSuggestion = null;
+              this.slectedToilet = null;
+              this.modifyTrigger = false;
+            },
+            error: (err) => console.error(err),
+          });
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+  rejectSuggestion() {
+    if (!this.selectedSuggestion) return;
+
+    this.api
+      .postSuggestionResolve(this.selectedSuggestion.suggestion_id, 'rejected')
+      .subscribe({
+        next: () => {
+          this.suggestions = this.suggestions.filter(
+            (s) => s.suggestion_id !== this.selectedSuggestion!.suggestion_id,
+          );
+
+          this.selectedSuggestion = null;
+          this.slectedToilet = null;
+          this.modifyTrigger = false;
+        },
+        error: (err) => console.error(err),
+      });
+  }
 }

@@ -62,7 +62,7 @@ app.get("/toilets/:id", async (req, res) => {
       FROM toilets
       WHERE toilet_id = $1 AND (osm_id IS NOT NULL OR approved = true);
         `,
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -105,7 +105,7 @@ app.get("/profil/:id", async (req, res) => {
             FROM users
             WHERE user_id = $1;
             `,
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -133,7 +133,7 @@ app.get("/rating/:toilet_id", async (req, res) => {
             JOIN users u ON u.user_id = r.user_id
             WHERE r.toilet_id = $1
             ORDER BY r.creation_time DESC;`,
-      [toilet_id]
+      [toilet_id],
     );
 
     res.json(result.rows);
@@ -152,7 +152,7 @@ app.get("/rating/average/:toilet_id", async (req, res) => {
             COALESCE(ROUND(AVG(value)::numeric, 1), 0) AS average
             FROM ratings
             WHERE toilet_id = $1;`,
-      [toilet_id]
+      [toilet_id],
     );
 
     res.json(result.rows[0]);
@@ -179,7 +179,7 @@ app.post(
             VALUES ($1, $2, $3, $4)
             RETURNING rating_id, toilet_id, value, description, creation_time;
             `,
-        [user_id, toilet_id, value, description]
+        [user_id, toilet_id, value, description],
       );
 
       res.status(201).json(result.rows[0]);
@@ -191,7 +191,7 @@ app.post(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.put(
@@ -216,7 +216,7 @@ app.put(
             SET nickname = $1
             WHERE user_id = $2
             RETURNING user_id, name, email, nickname, role;`,
-        [nickname, userID]
+        [nickname, userID],
       );
 
       res.json(result.rows[0]);
@@ -224,7 +224,7 @@ app.put(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.put(
@@ -244,7 +244,7 @@ app.put(
             SET nickname = NULL
             WHERE user_id = $1
             RETURNING user_id, name, email, nickname, role;`,
-        [userID]
+        [userID],
       );
 
       res.json(result.rows[0]);
@@ -252,7 +252,7 @@ app.put(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.get("/toilet/nearest", async (req, res) => {
@@ -277,7 +277,7 @@ app.get("/toilet/nearest", async (req, res) => {
       ORDER BY ST_Distance(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)
       LIMIT 1;
       `,
-      [lon, lat]
+      [lon, lat],
     );
 
     res.json(result.rows[0]);
@@ -313,7 +313,7 @@ app.get(
       WHERE user_id = $1
       ORDER BY creation_time DESC;
       `,
-        [user_id]
+        [user_id],
       );
 
       res.json(result.rows);
@@ -321,7 +321,7 @@ app.get(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.delete(
@@ -341,7 +341,7 @@ app.delete(
         RETURNING rating_id;
       
       `,
-        [ratingID, userID, isAdmin]
+        [ratingID, userID, isAdmin],
       );
 
       if (result.rowCount === 0) {
@@ -353,7 +353,7 @@ app.delete(
       console.error("Databse error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.put(
@@ -374,7 +374,7 @@ app.put(
             WHERE rating_id = $3
             AND (user_id = $4 OR $5 = 'admin')
             RETURNING *`,
-        [value, description, ratingID, userID, isAdmin]
+        [value, description, ratingID, userID, isAdmin],
       );
 
       if (result.rowCount === 0) {
@@ -386,7 +386,7 @@ app.put(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.post(
@@ -498,7 +498,7 @@ app.post(
           fee ?? null,
           wheelchair ?? null,
           extraInfoJson,
-        ]
+        ],
       );
 
       res.status(201).json(result.rows[0]);
@@ -506,7 +506,7 @@ app.post(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.get("/newToilet", async (req, res) => {
@@ -546,7 +546,7 @@ app.get("/newToilets/:id", async (req, res) => {
       FROM toilets
       WHERE toilet_id = $1;
         `,
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -579,7 +579,7 @@ app.put(
             approved_by = $2 
             WHERE toilet_id = $1
             RETURNING toilet_id, approved, approved_by`,
-        [toiletID, userID]
+        [toiletID, userID],
       );
 
       if (result.rowCount === 0) {
@@ -591,7 +591,7 @@ app.put(
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.post(
@@ -608,16 +608,15 @@ app.post(
             VALUES ($1, $2, $3)
             RETURNING suggestion_id, toilet_id, description, creation_time;
             `,
-        [user_id, toilet_id, suggestion]
+        [user_id, toilet_id, suggestion],
       );
 
       res.status(201).json(result.rows[0]);
     } catch (err) {
-     
       console.error("Database error", err);
       res.status(500).json({ message: "Database error" });
     }
-  }
+  },
 );
 
 app.get("/suggestions", async (req, res) => {
@@ -639,6 +638,151 @@ app.get("/suggestions", async (req, res) => {
     res.status(500).send("Database error");
   }
 });
+
+app.patch(
+  "/toiletsUpdate/:id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const user_id = req.user.user_id;
+    const toilet_id = Number(req.params.id);
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const {
+      name,
+      operator,
+      access,
+      opening_hours,
+      fee,
+      wheelchair,
+      extra_info,
+    } = req.body;
+
+    let extraInfoJson = null;
+
+    if (
+      extra_info &&
+      typeof extra_info === "object" &&
+      !Array.isArray(extra_info)
+    ) {
+      const cleaned = {};
+      for (const [k, v] of Object.entries(extra_info)) {
+        if (typeof k !== "string") continue;
+        if (typeof v !== "string") continue;
+        const key = k.trim();
+        const val = v.trim();
+        if (!key || !val) continue;
+        cleaned[key] = val;
+      }
+      extraInfoJson = Object.keys(cleaned).length
+        ? JSON.stringify(cleaned)
+        : null;
+    }
+
+    try {
+      const result = await pool.query(
+        `
+        UPDATE toilets
+        SET
+          name = $1,
+          operator = $2,
+          access = $3,
+          opening_hours = $4,
+          fee = $5,
+          wheelchair = $6,
+          extra_info = CASE
+            WHEN $7::jsonb IS NULL THEN NULL
+            ELSE (
+              SELECT hstore(array_agg(key), array_agg(value))
+              FROM jsonb_each_text($7::jsonb)
+            )
+          END
+        WHERE toilet_id = $8
+        RETURNING
+          toilet_id,
+          name,
+          operator,
+          access,
+          approved,
+          added_by,
+          opening_hours,
+          fee,
+          wheelchair,
+          osm_id,
+          hstore_to_json(extra_info) AS extra_info,
+          ST_X(location::geometry) AS lon,
+          ST_Y(location::geometry) AS lat;
+        `,
+        [
+          (name ?? "").trim(),
+          operator ?? null,
+          access ?? null,
+          opening_hours ?? null,
+          fee ?? null,
+          wheelchair ?? null,
+          extraInfoJson,
+          toilet_id,
+        ],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res
+        .status(500)
+        .json({
+          message: "Database error",
+          detail: err.message,
+          code: err.code,
+        });
+    }
+  },
+);
+
+app.post(
+  "/suggestion/:id/resolve",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const suggestion_id = Number(req.params.id);
+    const user_id = req.user.user_id;
+    const { status } = req.body;
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    if (status !== "approved" && status !== "rejected") {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    try {
+      const result = await pool.query(
+        `
+            UPDATE suggestions SET
+            status = $1,
+            handled_by = $2,
+            handled_at = NOW()
+            WHERE suggestion_id = $3
+            RETURNING *;
+            `,
+        [status, user_id, suggestion_id],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Not found" });
+      }
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  },
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
