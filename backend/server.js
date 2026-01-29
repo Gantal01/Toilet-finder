@@ -124,6 +124,7 @@ app.get("/rating/:toilet_id", async (req, res) => {
     const result = await pool.query(
       `
             SELECT
+            r.rating_id,
             r.toilet_id,
             r.value,
             r.description,
@@ -779,6 +780,37 @@ app.post(
       res.status(201).json(result.rows[0]);
     } catch (err) {
       console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  },
+);
+
+app.delete(
+  "/toilet/:toilet_id/delete",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const isAdmin = req.user.role;
+    const toiletID = Number(req.params.toilet_id);
+
+    try {
+      const result = await pool.query(
+        `
+        DELETE FROM toilets
+        WHERE toilet_id = $1
+        AND ($2 = 'admin')
+        RETURNING toilet_id;
+      
+      `,
+        [toiletID, isAdmin],
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+
+      res.json({ message: "Siekres törlés" });
+    } catch (err) {
+      console.error("Databse error", err);
       res.status(500).json({ message: "Database error" });
     }
   },

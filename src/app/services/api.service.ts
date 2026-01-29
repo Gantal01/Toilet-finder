@@ -105,4 +105,8 @@ export class ApiService {
   postSuggestionResolve(suggestion_id: number, status: 'approved' | 'rejected'){
     return this.http.post(`${environment.apiUrl}/suggestion/${suggestion_id}/resolve`, {status})
   }
+
+  deleteToilet(toilet_id: number): Observable<{messange: string}>{
+    return this.http.delete<{messange: string}>(`${environment.apiUrl}/toilet/${toilet_id}/delete`)
+  }
 }

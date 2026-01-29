@@ -100,6 +100,7 @@
             </div>
           </mat-card-content>
           <button mat-button (click)="setModifyTrigger()">Módosítás</button>
+          <button mat-button (click)="deleteToilet()">Törlés</button>
           <h4>Vélemények az illemhelyről:</h4>
           <div class="ratings-list" *ngIf="!modifyTrigger">
             <div *ngFor="let rat of toiletRatings">

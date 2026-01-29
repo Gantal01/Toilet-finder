@@ -133,6 +133,8 @@ export class AdminComponent implements OnInit {
   getToiletRatings(toiletID: number) {
     this.api.getRatings(toiletID).subscribe({
       next: (ratings) => {
+        console.log('toiletRatings raw:', ratings);
+      console.log('first item keys:', ratings?.[0] && Object.keys(ratings[0]));
         this.toiletRatings = ratings;
       },
       error: (err) => console.error('API error', err),
@@ -317,7 +319,6 @@ export class AdminComponent implements OnInit {
     });
   }
 
-
   initEditToilet(){
 
     if(!this.slectedToilet){
@@ -334,5 +335,26 @@ export class AdminComponent implements OnInit {
         };
 
         this.extraInfoText = JSON.stringify(this.slectedToilet.extra_info ?? {}, null, 2);
+  }
+
+  deleteToilet(){
+
+    if(!this.slectedToilet){
+      return;
+    }
+
+    if (!confirm('Biztosan törölöd ezt a mosdót?')) {
+      return;
+    }
+
+    this.api.deleteToilet(this.slectedToilet?.toilet_id).subscribe({
+      next: () => {
+        this.toilets = this.toilets.filter(
+          (t) =>  t.toilet_id !== this.slectedToilet?.toilet_id
+        )
+        this.slectedToilet = null;
+      },
+      error: (err) => console.error(err),
+    })
   }
 }
