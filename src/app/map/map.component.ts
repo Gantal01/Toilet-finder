@@ -138,7 +138,7 @@ export class MapComponent implements AfterViewInit {
       error: (err) => console.error(err),
     });
 
-    this.mapAction.selectNerestToilet$.subscribe(() => {
+    this.mapAction.selectNearestToilet$.subscribe(() => {
       this.getNearestToilet();
     });
 

@@ -5,10 +5,6 @@
     <mat-label>Keresés</mat-label>
     <input matInput placeholder="Település" />
   </mat-form-field>
-  <a mat-button *ngIf="isMapPage" (click)="selectNearestToilet()"
-    >Legközelebbi mosdó</a
-  >
-
   <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
     <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
   </ng-container>

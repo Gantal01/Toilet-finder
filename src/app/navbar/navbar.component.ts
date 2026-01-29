@@ -6,8 +6,7 @@ import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { MapActionService } from '../services/map-action.service';
-import { filter } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-navbar',
@@ -29,15 +28,8 @@ export class NavbarComponent {
 
   constructor(
     public auth: AuthService,
-    private router: Router,
-    private mapAction: MapActionService
-  ) {
-    this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => {
-        this.isMapPage = e.urlAfterRedirects === '/';
-      });
-  }
+    private router: Router
+  ) { }
 
   loginWithGoogle() {
     this.auth.loginWithGoogle();
@@ -46,9 +38,5 @@ export class NavbarComponent {
   logout() {
     this.auth.logout();
     this.router.navigate(['']);
-  }
-
-  selectNearestToilet() {
-    this.mapAction.triggerSelectNearestToilet();
   }
 }

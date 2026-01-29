@@ -8,7 +8,7 @@ export class MapActionService {
 
   private selectNearestToiletSource = new Subject<void>();
 
-  selectNerestToilet$ = this.selectNearestToiletSource.asObservable();
+  selectNearestToilet$ = this.selectNearestToiletSource.asObservable();
 
   triggerSelectNearestToilet(){
     this.selectNearestToiletSource.next();
