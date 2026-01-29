@@ -201,6 +201,7 @@ export class AdminComponent implements OnInit {
     this.userRatings = [];
     this.toiletRatings = [];
     this.selectedSuggestion = null;
+    this.modifyTrigger = false;
   }
 
   setSuggestion(suggestion: Suggestion) {

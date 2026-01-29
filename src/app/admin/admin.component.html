@@ -82,15 +82,15 @@
               {{ slectedToilet.wheelchair || "Nincs megadva" }}
             </p>
             <p>
-              Jóvágyaott: {{ slectedToilet.approved || "OSM adatbázidból" }}
+              Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem"}}
             </p>
             <p>
               Általa jóváhagyott:
-              {{ slectedToilet.approved_by || "OSM adatbázidból" }}
+              {{ slectedToilet.approved_by ?? "OSM adatbázidból" }}
             </p>
             <p>
               Álatala hozzáadva:
-              {{ slectedToilet.added_by || "OSM adatbázisból" }}
+              {{ slectedToilet.added_by ?? "OSM adatbázisból" }}
             </p>
             <div *ngIf="slectedToilet.extra_info as extra_info">
               <p>További adatok:</p>
@@ -218,14 +218,16 @@
               Mozgáskorlátozott:
               {{ slectedToilet.wheelchair || "Nincs megadva" }}
             </p>
-            <p>Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
+            <p>
+              Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem"}}
+            </p>
             <p>
               Általa jóváhagyott:
-              {{ slectedToilet.approved_by || "OSM adatbázidból" }}
+              {{ slectedToilet.approved_by ?? "OSM adatbázidból" }}
             </p>
             <p>
               Álatala hozzáadva:
-              {{ slectedToilet.added_by || "OSM adatbázisból" }}
+              {{ slectedToilet.added_by ?? "OSM adatbázisból" }}
             </p>
             <div *ngIf="slectedToilet.extra_info as extra_info">
               <p>További adatok:</p>
