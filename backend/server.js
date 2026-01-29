@@ -210,6 +210,15 @@ app.put(
       return res.status(403).json({ message: "Not valid nickname" });
     }
 
+    const exist = await pool.query(
+      `SELECT 1 FROM users WHERE nickname = $1 AND user_id <> $2`,
+      [nickname.trim(), userID],
+    );
+
+    if (exist.rowCount > 0) {
+      return res.status(409).json({ message: "Nickname is already taken!" });
+    }
+
     try {
       const result = await pool.query(
         `
@@ -734,13 +743,11 @@ app.patch(
       res.status(201).json(result.rows[0]);
     } catch (err) {
       console.error("Database error", err);
-      res
-        .status(500)
-        .json({
-          message: "Database error",
-          detail: err.message,
-          code: err.code,
-        });
+      res.status(500).json({
+        message: "Database error",
+        detail: err.message,
+        code: err.code,
+      });
     }
   },
 );

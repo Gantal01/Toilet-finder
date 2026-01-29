@@ -40,7 +40,10 @@ export class ProfileComponent implements OnInit {
 
   ratings: Rating[] = [];
 
-  constructor(private api: ApiService, private auth: AuthService) {}
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => {
@@ -75,12 +78,20 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
+    if (!confirm('Biztosan megváltoztatod a nevet?')) {
+      return;
+    }
+
     this.api.putNickname(this.newNickname, this.userId).subscribe({
       next: (updatedUser) => {
         this.user = updatedUser;
         this.formTrigger = false;
       },
       error: (err) => {
+        if (err.status === 409) {
+          alert('Ez a név már foglalt!');
+        }
+
         console.error('Nickname update error', err);
       },
     });
