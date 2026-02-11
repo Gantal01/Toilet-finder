@@ -188,6 +188,16 @@ export class AdminComponent implements OnInit {
     });
   }
 
+    rejectToilet(toilet_id: number) {
+    this.api.putToiletApprove(toilet_id).subscribe({
+      next: () => {
+        this.getNewToilets();
+        this.slectedToilet = null;
+      },
+      error: (err) => console.error('API error', err),
+    });
+  }
+
   getNewToilets() {
     this.api.getNewToilets().subscribe({
       next: (data) => {

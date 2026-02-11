@@ -823,6 +823,40 @@ app.delete(
   },
 );
 
+app.put(
+  "/toilet/:toilet_id/reject",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const toiletID = Number(req.params.toilet_id);
+    const userID = req.user.user_id;
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    try {
+      const result = await pool.query(
+        `
+            UPDATE toilets
+            SET approved = false,
+            approved_by = $2 
+            WHERE toilet_id = $1
+            RETURNING toilet_id, approved, approved_by`,
+        [toiletID, userID],
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Toilet not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  },
+);
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

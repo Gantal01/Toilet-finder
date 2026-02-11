@@ -109,4 +109,8 @@ export class ApiService {
   deleteToilet(toilet_id: number): Observable<{messange: string}>{
     return this.http.delete<{messange: string}>(`${environment.apiUrl}/toilet/${toilet_id}/delete`)
   }
+
+  putToiletReject(toilet_id: number): Observable<Rating>{
+    return this.http.put<Rating>(`${environment.apiUrl}/toilet/${toilet_id}/reject`, {})
+  }
 }
