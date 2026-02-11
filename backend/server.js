@@ -857,6 +857,38 @@ app.put(
   },
 );
 
+app.get("/geocode", async (req, res) => {
+  try {
+    const q = String(req.query.q ?? "").trim();
+    if (!q) return res.json(null);
+
+    const url =
+      `https://nominatim.openstreetmap.org/search?` +
+      `format=jsonv2&addressdetails=0&limit=1&countrycodes=hu&q=${encodeURIComponent(q)}`;
+
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "HolVanMosdo",
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(502).json(null);
+    }
+
+    const data = await response.json();
+    const firstRes = data?.[0];
+    if (!firstRes) {
+      return res.json(null);
+    }
+
+    res.json({ lat: Number(firstRes.lat), lon: Number(firstRes.lon) });
+  } catch (err) {
+    res.status(500).json(null);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

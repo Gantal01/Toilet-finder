@@ -3,7 +3,15 @@
   <span>HolVanMosdó?</span>
   <mat-form-field>
     <mat-label>Keresés</mat-label>
-    <input matInput placeholder="Település" />
+    <input
+      matInput
+      placeholder="Település"
+      [formControl]="searchControl"
+      (keyup.enter)="onSearch()"
+    />
+    <mat-error *ngIf="errorMessage">
+      {{ errorMessage }}
+    </mat-error>
   </mat-form-field>
   <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
     <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>

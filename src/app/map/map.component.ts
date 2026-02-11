@@ -143,6 +143,10 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.currentPosition();
+
+    this.mapAction.jumpTo$.subscribe(({lat, lon, zoom}) => {
+      this.map.setView([lat, lon], zoom);
+    })
   }
 
   private initMap(): void {

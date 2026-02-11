@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ToiletNearest } from '../models/toilet-nearest';
 import { ToiletList } from '../models/toilet-list';
 import { Toilet } from '../models/toilet';
@@ -113,4 +113,10 @@ export class ApiService {
   putToiletReject(toilet_id: number): Observable<Rating>{
     return this.http.put<Rating>(`${environment.apiUrl}/toilet/${toilet_id}/reject`, {})
   }
+
+  getGeocode(query: string): Observable<{lat: number, lon: number} | null>{
+    return this.http.get<{lat: number, lon: number} | null>(`${environment.apiUrl}/geocode?q=${encodeURIComponent(query)}`)
+  }
+
+
 }
