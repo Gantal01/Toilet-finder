@@ -56,15 +56,20 @@ passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
       const result = await pool.query(
-        'SELECT user_id, email, role FROM users WHERE user_id = $1',
+        'SELECT user_id, email, role, is_deleted FROM users WHERE user_id = $1',
         [jwtPayload.user_id]
       );
 
-      if (result.rows.length === 0) {
+      const user = result.rows[0];
+      if(!user){
         return done(null, false);
       }
 
-      return done(null, result.rows[0]);
+      if(user.is_deleted){
+        return done(null, false);
+      }
+
+      return done(null, user);
     } catch (err) {
       return done(err, false);
     }

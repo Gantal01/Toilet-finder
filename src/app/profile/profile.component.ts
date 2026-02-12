@@ -10,6 +10,7 @@ import { StarRatingComponent } from '../components/star-rating/star-rating.compo
 import { MatDividerModule } from '@angular/material/divider';
 import { Rating } from '../models/rating';
 import { User } from '../models/user';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -31,7 +32,7 @@ import { User } from '../models/user';
 })
 export class ProfileComponent implements OnInit {
   userId: number | null = null;
-  user: any;
+  user: User | null = null;
 
   formTrigger: boolean = false;
   newNickname: string = '';
@@ -43,6 +44,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private api: ApiService,
     private auth: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -143,5 +145,18 @@ export class ProfileComponent implements OnInit {
         },
         error: (err) => console.error('Update rating error', err),
       });
+  }
+
+    deleteUser(){
+      if (!confirm('Biztosan törölni akarja a profilját?')) {
+        return;
+      }
+    this.api.deleteUser().subscribe({
+      next: () =>{
+        this.auth.logout();
+        this.router.navigate(['']);
+      },
+      error: (err) => console.error(err),
+    })
   }
 }

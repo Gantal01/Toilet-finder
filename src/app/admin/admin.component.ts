@@ -367,4 +367,20 @@ export class AdminComponent implements OnInit {
       error: (err) => console.error(err),
     })
   }
+
+
+  deleteUserByAdmin(user_id: number){
+
+    if(!confirm("Biztoan törli a felhasználót?")){
+      return;
+    }
+
+    this.api.deleteUserByAdmin(user_id).subscribe({
+      next: () =>{
+        const index = this.users.filter( u => u.user_id === user_id);
+      },
+      error: (err) => console.error(err),
+    })
+  }
+
 }

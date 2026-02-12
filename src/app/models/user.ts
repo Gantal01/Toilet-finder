@@ -5,4 +5,7 @@ export interface User {
   role: string;
   nickname: string | null;
   google_id: string;
+  is_deleted: boolean;
+  deleted_at: Date;
+  deleted_by: number;
 }

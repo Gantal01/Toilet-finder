@@ -889,6 +889,88 @@ app.get("/geocode", async (req, res) => {
   }
 });
 
+app.patch(
+  "/user/me/delete",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const userID = req.user.user_id;
+
+    try {
+      const result = await pool.query(
+        `
+      UPDATE users
+      SET is_deleted = true,
+      deleted_at = NOW(),
+      deleted_by = $1
+      WHERE user_id = $1 AND is_deleted = false
+      RETURNING user_id, is_deleted, deleted_at, deleted_by`,
+        [userID],
+      );
+
+      if (result.rowCount === 0) {
+        return res
+          .status(404)
+          .json({ message: "Already deleted or not found" });
+      }
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  },
+);
+
+app.patch(
+  "/user/:id/delete",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const userID = Number(req.params.id);
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    if (userID === req.user.user_id) {
+      return res
+        .status(400)
+        .json({ message: "Use /user/me/delete for self delete" });
+    }
+
+    const adminId = req.user.user_id;
+
+    try {
+      const result = await pool.query(
+        `
+      UPDATE users
+      SET is_deleted = true,
+      deleted_at = NOW(),
+      deleted_by = $2
+      WHERE user_id = $1 AND is_deleted = false
+      RETURNING user_id, is_deleted, deleted_at, deleted_by`,
+        [userID, adminId],
+      );
+
+      if (result.rowCount === 0) {
+        return res
+          .status(404)
+          .json({ message: "Already deleted or not found" });
+      }
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Database error", err);
+      res.status(500).json({ message: "Database error" });
+    }
+  },
+);
+
+app.get(
+  "/user/me",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json(req.user);
+  },
+);
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

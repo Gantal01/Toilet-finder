@@ -51,11 +51,11 @@ export class ApiService {
   }
 
   putNickname(nickname: string, userId: number){
-    return this.http.put(`${environment.apiUrl}/users/${userId}/nickname`, {nickname});
+    return this.http.put<User>(`${environment.apiUrl}/users/${userId}/nickname`, {nickname});
   }
 
   removeNickname(userId: number){
-    return this.http.put(`${environment.apiUrl}/users/${userId}/nickname/remove`, {});
+    return this.http.put<User>(`${environment.apiUrl}/users/${userId}/nickname/remove`, {});
   }
 
   getNearestToilet(lat: number, lng: number): Observable<ToiletNearest>{
@@ -118,5 +118,16 @@ export class ApiService {
     return this.http.get<{lat: number, lon: number} | null>(`${environment.apiUrl}/geocode?q=${encodeURIComponent(query)}`)
   }
 
+  deleteUser(){
+    return this.http.patch(`${environment.apiUrl}/user/me/delete`, {})
+  }
+
+  deleteUserByAdmin(user_id: number){
+    return this.http.patch(`${environment.apiUrl}/user/${user_id}/delete`, {})
+  }
+
+  getMe(){
+    return this.http.get(`${environment.apiUrl}/user/me`)
+  }
 
 }

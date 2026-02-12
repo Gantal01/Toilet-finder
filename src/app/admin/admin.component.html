@@ -5,7 +5,7 @@
       <mat-card>
         <div class="listElement">
           <div *ngFor="let user of users" class="listItem">
-            <mat-card (click)="setUser(user)">
+            <mat-card *ngIf="!user.is_deleted" (click)="setUser(user)">
               <mat-card-content>
                 <p>Google ID: {{ user.google_id }}</p>
                 <p>Név: {{ user.name }}</p>
@@ -24,6 +24,7 @@
             <p>Nickname: {{ selectedUser.nickname }}</p>
             <p>Szerepkör: {{ selectedUser.role }}</p>
             <p>Google ID: {{ selectedUser.google_id }}</p>
+            <button mat-button (click)="deleteUserByAdmin(selectedUser.user_id)">Felhasználó törlése</button>
             <mat-divider></mat-divider>
             <br />
             <h4>Felhasználó véleményei:</h4>
