@@ -134,7 +134,10 @@ export class AdminComponent implements OnInit {
     this.api.getRatings(toiletID).subscribe({
       next: (ratings) => {
         console.log('toiletRatings raw:', ratings);
-      console.log('first item keys:', ratings?.[0] && Object.keys(ratings[0]));
+        console.log(
+          'first item keys:',
+          ratings?.[0] && Object.keys(ratings[0]),
+        );
         this.toiletRatings = ratings;
       },
       error: (err) => console.error('API error', err),
@@ -146,7 +149,7 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    if (ratingID === this.selectedUser?.user_id) {
+    if (this.selectedUser) {
       this.api.deleteRating(ratingID).subscribe({
         next: () => {
           this.userRatings = this.userRatings.filter(
@@ -188,7 +191,7 @@ export class AdminComponent implements OnInit {
     });
   }
 
-    rejectToilet(toilet_id: number) {
+  rejectToilet(toilet_id: number) {
     this.api.putToiletApprove(toilet_id).subscribe({
       next: () => {
         this.getNewToilets();
@@ -233,7 +236,7 @@ export class AdminComponent implements OnInit {
       this.modifyTrigger = true;
     }
 
-    if(this.modifyTrigger){
+    if (this.modifyTrigger) {
       this.initEditToilet();
     }
   }
@@ -329,27 +332,29 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  initEditToilet(){
-
-    if(!this.slectedToilet){
+  initEditToilet() {
+    if (!this.slectedToilet) {
       return;
     }
 
     this.editToilet = {
-          name: this.slectedToilet.name ?? null,
-          operator: this.slectedToilet.operator ?? null,
-          access: this.slectedToilet.access ?? null,
-          opening_hours: this.slectedToilet.opening_hours ?? null,
-          fee: this.slectedToilet.fee ?? null,
-          wheelchair: this.slectedToilet.wheelchair ?? null,
-        };
+      name: this.slectedToilet.name ?? null,
+      operator: this.slectedToilet.operator ?? null,
+      access: this.slectedToilet.access ?? null,
+      opening_hours: this.slectedToilet.opening_hours ?? null,
+      fee: this.slectedToilet.fee ?? null,
+      wheelchair: this.slectedToilet.wheelchair ?? null,
+    };
 
-        this.extraInfoText = JSON.stringify(this.slectedToilet.extra_info ?? {}, null, 2);
+    this.extraInfoText = JSON.stringify(
+      this.slectedToilet.extra_info ?? {},
+      null,
+      2,
+    );
   }
 
-  deleteToilet(){
-
-    if(!this.slectedToilet){
+  deleteToilet() {
+    if (!this.slectedToilet) {
       return;
     }
 
@@ -360,27 +365,24 @@ export class AdminComponent implements OnInit {
     this.api.deleteToilet(this.slectedToilet?.toilet_id).subscribe({
       next: () => {
         this.toilets = this.toilets.filter(
-          (t) =>  t.toilet_id !== this.slectedToilet?.toilet_id
-        )
+          (t) => t.toilet_id !== this.slectedToilet?.toilet_id,
+        );
         this.slectedToilet = null;
       },
       error: (err) => console.error(err),
-    })
+    });
   }
 
-
-  deleteUserByAdmin(user_id: number){
-
-    if(!confirm("Biztoan törli a felhasználót?")){
+  deleteUserByAdmin(user_id: number) {
+    if (!confirm('Biztoan törli a felhasználót?')) {
       return;
     }
 
     this.api.deleteUserByAdmin(user_id).subscribe({
-      next: () =>{
-        const index = this.users.filter( u => u.user_id === user_id);
+      next: () => {
+        const index = this.users.filter((u) => u.user_id === user_id);
       },
       error: (err) => console.error(err),
-    })
+    });
   }
-
 }

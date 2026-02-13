@@ -73,4 +73,9 @@ export class NavbarComponent {
       },
     });
   }
+
+  homepage(){
+    this.router.navigate([''])
+  }
+
 }
