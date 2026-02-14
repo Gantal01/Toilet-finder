@@ -963,11 +963,99 @@ app.patch(
   },
 );
 
+app.get("/user/me", (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      return res.status(401).json({ message: info?.message ?? "UNATHUROZED" });
+    }
+
+    res.json(user);
+  })(req, res, next);
+});
+
 app.get(
-  "/user/me",
+  "/bela",
   passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json(req.user);
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const q = (req.query.q ?? "").toString().trim();
+    try {
+      const result = await pool.query(
+        `SELECT 
+      toilet_id,
+      osm_id,
+      name,
+      operator,
+      access,
+      approved  
+      FROM toilets
+      WHERE (osm_id IS NOT NULL OR approved = true)
+        AND (
+          $1 = '' OR
+          name ILIKE '%' || $1 || '%' OR
+          operator ILIKE '%' || $1 || '%' OR
+          access ILIKE '%' || $1 || '%' OR
+          toilet_id::text ILIKE '%' || $1 || '%'
+        )
+      ORDER BY toilet_id DESC;
+      ;`,
+        [q],
+      );
+
+      res.json(result.rows);
+    } catch (err) {
+      console.error("DB error", err);
+      res.status(500).send("DAtabase error");
+    }
+  },
+);
+
+app.get(
+  "/sanyi",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const q = (req.query.q ?? "").toString().trim();
+    try {
+      const result = await pool.query(
+        `SELECT 
+      user_id,
+      name,
+      email,
+      role,
+      nickname,
+      google_id 
+      FROM users
+      WHERE is_deleted = false
+        AND (
+          $1 = '' OR
+          name ILIKE '%' || $1 || '%' OR
+          email ILIKE '%' || $1 || '%' OR
+          role ILIKE '%' || $1 || '%' OR
+          nickname ILIKE '%' || $1 || '%' OR
+          user_id::text ILIKE '%' || $1 || '%' OR
+          google_id::text ILIKE '%' || $1 || '%'
+        )
+      ORDER BY user_id DESC;
+      ;`,
+        [q],
+      );
+
+      res.json(result.rows);
+    } catch (err) {
+      console.error("DB error", err);
+      res.status(500).send("DAtabase error");
+    }
   },
 );
 

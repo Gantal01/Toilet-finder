@@ -1,6 +1,14 @@
 <mat-tab-group (selectedTabChange)="onTabChange($event)">
   <mat-tab label="Felhasználók">
     <h2>Felhasználók:</h2>
+    <mat-form-field>
+      <mat-label>Keresés</mat-label>
+      <input
+        matInput
+        placeholder="pl.: Gantal vagy 2"
+        [formControl]="searchControlUser"
+      />
+    </mat-form-field>
     <div class="nameContainer">
       <mat-card>
         <div class="listElement">
@@ -24,7 +32,12 @@
             <p>Nickname: {{ selectedUser.nickname }}</p>
             <p>Szerepkör: {{ selectedUser.role }}</p>
             <p>Google ID: {{ selectedUser.google_id }}</p>
-            <button mat-button (click)="deleteUserByAdmin(selectedUser.user_id)">Felhasználó törlése</button>
+            <button
+              mat-button
+              (click)="deleteUserByAdmin(selectedUser.user_id)"
+            >
+              Felhasználó törlése
+            </button>
             <mat-divider></mat-divider>
             <br />
             <h4>Felhasználó véleményei:</h4>
@@ -51,6 +64,14 @@
 
   <mat-tab label="Illemhelyek">
     <h2>Illemhelyek:</h2>
+    <mat-form-field>
+      <mat-label>Keresés</mat-label>
+      <input
+        matInput
+        placeholder="pl.: 1234 vagy MÁV"
+        [formControl]="searchControlToilet"
+      />
+    </mat-form-field>
     <div class="nameContainer">
       <mat-card *ngIf="!modifyTrigger">
         <div class="listElement">
@@ -82,9 +103,7 @@
               Mozgáskorlátozott:
               {{ slectedToilet.wheelchair || "Nincs megadva" }}
             </p>
-            <p>
-              Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem"}}
-            </p>
+            <p>Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
             <p>
               Általa jóváhagyott:
               {{ slectedToilet.approved_by ?? "OSM adatbázidból" }}
@@ -126,7 +145,7 @@
                 <input
                   matInput
                   [(ngModel)]="editToilet.name"
-                  placeholder= "{{slectedToilet.name}}"
+                  placeholder="{{ slectedToilet.name }}"
                   name="name"
                 />
               </mat-form-field>
@@ -135,7 +154,7 @@
                 <input
                   matInput
                   [(ngModel)]="editToilet.operator"
-                  placeholder="{{slectedToilet.operator}}"
+                  placeholder="{{ slectedToilet.operator }}"
                   name="operator"
                 />
               </mat-form-field>
@@ -144,7 +163,7 @@
                 <input
                   matInput
                   [(ngModel)]="editToilet.access"
-                  placeholder="{{slectedToilet.access}}"
+                  placeholder="{{ slectedToilet.access }}"
                   name="access"
                 />
               </mat-form-field>
@@ -153,7 +172,7 @@
                 <input
                   matInput
                   [(ngModel)]="editToilet.opening_hours"
-                  placeholder="{{slectedToilet.opening_hours}}"
+                  placeholder="{{ slectedToilet.opening_hours }}"
                   name="openinghours"
                 />
               </mat-form-field>
@@ -220,9 +239,7 @@
               Mozgáskorlátozott:
               {{ slectedToilet.wheelchair || "Nincs megadva" }}
             </p>
-            <p>
-              Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem"}}
-            </p>
+            <p>Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
             <p>
               Általa jóváhagyott:
               {{ slectedToilet.approved_by ?? "OSM adatbázidból" }}

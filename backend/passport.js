@@ -62,11 +62,11 @@ passport.use(
 
       const user = result.rows[0];
       if(!user){
-        return done(null, false);
+        return done(null, false, {message: "USER_NOT_FOUND"});
       }
 
       if(user.is_deleted){
-        return done(null, false);
+        return done(null, false, {message: "USER_DELETED"});
       }
 
       return done(null, user);

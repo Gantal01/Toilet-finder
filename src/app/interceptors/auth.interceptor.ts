@@ -6,6 +6,9 @@ import { catchError, throwError } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+
+  console.log('INTERCEPTOR RUN', req.method, req.url);
+
   const token = localStorage.getItem('jwt');
 
   const router = inject(Router);
@@ -21,16 +24,37 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(authReq).pipe(
       catchError((err) => {
-        if (err.status === 401) {
+
+              console.log('HTTP ERR', err.status, authReq.method, authReq.url, err.error);
+
+        const isMe = authReq.url.includes('/user/me');
+
+        if(err.status === 401 && isMe){
+        
+        
+
+        const msg = err?.error.message;
+        
+
           auth.logout();
           router.navigate(['']);
 
+        if (msg === "USER_DELETED") {
           snackbar.open(
             'Törölt felhasználó. Kérlek vedd fel velünk a kapcsolatot!',
             'Bezár',
+            {duration: 3000} 
+          );
+        }else{
+            snackbar.open(
+            'Munakmenet lejárt',
+            'Bezár',
+            {duration: 3000} 
           );
         }
-        return throwError(() => err);
+      }
+      return throwError(() => err);
+
       }),
     );
   }

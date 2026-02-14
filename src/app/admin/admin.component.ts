@@ -18,9 +18,10 @@ import { MatButton } from '@angular/material/button';
 import { Suggestion } from '../models/suggestion';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { A11yModule } from '@angular/cdk/a11y';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { debounceTime, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -43,6 +44,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     FormsModule,
     MatInputModule,
     MatSlideToggleModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
@@ -61,25 +63,39 @@ export class AdminComponent implements OnInit {
   modifyTrigger: boolean = false;
   editToilet: any = null;
   extraInfoText: string = '';
+  searchControlUser = new FormControl<string>('', {nonNullable: true});
+  searchControlToilet = new FormControl<string>('', {nonNullable: true});
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-    this.api.getToilets().subscribe({
-      next: (data) => {
-        this.toilets = data;
-      },
-      error: (err) => console.error('APi error: ', err),
-    });
+    this.searchControlToilet.valueChanges
+      .pipe(startWith("") ,debounceTime(300))
+      .subscribe((value) => {
+        const q = (value ?? '').trim();
+        this.api.getToiletsAdmin(q).subscribe({
+          next: (data) => {
+            this.slectedToilet = null;
+            this.toilets = data;
+          },
+          error: (err) => console.error(err),
+        });
+      });
 
-    this.api.getUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-      },
-      error: (err) => console.error('APi error: ', err),
-    });
+    this.searchControlUser.valueChanges
+      .pipe(startWith("") ,debounceTime(300))
+      .subscribe((value) => {
+        const q = (value ?? '').trim();
+        this.api.getUsersAdmin(q).subscribe({
+          next: (data) => {
+            this.selectedUser = null;
+            this.users = data;
+          },
+          error: (err) => console.error(err),
+        });
+      });
 
-    this.api.getNewSuggestions().subscribe({
+      this.api.getNewSuggestions().subscribe({
       next: (data) => {
         this.suggestions = data;
       },
