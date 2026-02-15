@@ -1,18 +1,22 @@
-#map {
-    height: 100vh;
-    width: 100%;
+:host {
+  display: block;
+  height: 100%;
 }
 
+#map {
+  height: 100%;
+  width: 100%;
+}
 
 .infopanel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 400px;
-    height: 100%;
-    padding: 20px;
-    background: white;
-    z-index: 1000;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  padding: 20px;
+  background: white;
+  z-index: 1000;
 }
 
 #map-wrapper {
@@ -22,7 +26,7 @@
 }
 
 .mat-fabs {
-  position:absolute;
+  position: absolute;
   left: 12px;
   top: 87px;
   z-index: 1200;
@@ -48,7 +52,7 @@
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     background: #111;
     opacity: 0.85;
@@ -84,5 +88,4 @@
   opacity: 70%;
   padding: 10px;
   border-radius: 10px;
-  
 }

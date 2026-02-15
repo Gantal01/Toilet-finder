@@ -1,0 +1,37 @@
+<ng-container class="sidenav-menu">
+  <h2><span>HolVanMosdó?</span></h2>
+  <a mat-button (click)="closeMenu()" routerLink="/" class="menu-button"
+    >Térkép</a
+  >
+  <ng-container
+    *ngIf="!(auth.isLoggedIn$ | async); else loginBlock"
+    class="menu-button"
+  >
+    <a mat-button (click)="loginWithGoogle()" class="menu-button"
+      >Bejelentkezés</a
+    >
+  </ng-container>
+
+  <ng-template #loginBlock>
+    <ng-container *ngIf="auth.user$ | async as user" class="menu-button">
+      <a
+        mat-button
+        (click)="closeMenu()"
+        *ngIf="user.role === 'admin'"
+        routerLink="/admin"
+        class="menu-button"
+        >Admin</a
+      >
+      <a
+        mat-button
+        (click)="closeMenu()"
+        routerLink="/profile"
+        class="menu-button"
+        >Profil</a
+      >
+      <button mat-button (click)="logout()" class="menu-button">
+        Kijelentkezés
+      </button>
+    </ng-container>
+  </ng-template>
+</ng-container>

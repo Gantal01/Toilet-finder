@@ -1,27 +1,77 @@
 <mat-toolbar id="navbar">
-  <a (click)="homepage()"><img src="assets/toilet_marker.png" alt="logo" /></a>
-  <span>HolVanMosdó?</span>
-  <mat-form-field>
-    <mat-label>Keresés</mat-label>
-    <input
-      matInput
-      placeholder="Település"
-      [formControl]="searchControl"
-      (keyup.enter)="onSearch()"
-    />
-    <mat-error *ngIf="errorMessage">
-      {{ errorMessage }}
-    </mat-error>
-  </mat-form-field>
-  <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
-    <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
-  </ng-container>
+  <div *ngIf="!isLargeScreen" class="mobile-menu">
+    <div class="left">
+      <a (click)="homepage()"
+        ><img src="assets/toilet_marker.png" alt="logo"
+      /></a>
+    </div>
+    <div class="center">
+      <mat-form-field
+        class="search"
+        appearance="outline"
+        subscriptSizing="dynamic"
+      >
+        <mat-label>Keresés</mat-label>
+        <input
+          matInput
+          placeholder="Település"
+          [formControl]="searchControl"
+          (keyup.enter)="onSearch()"
+        />
+        <mat-error *ngIf="errorMessage">
+          {{ errorMessage }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="right">
+      <button mat-icon-button (click)="menuClick.emit()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+  </div>
 
-  <ng-template #loginBlock>
-    <ng-container *ngIf="auth.user$ | async as user">
-      <a mat-button *ngIf="user.role === 'admin'" routerLink="/admin">Admin</a>
-      <a mat-button routerLink="/profile">Profil</a>
-      <button mat-button (click)="logout()">Kijelentkezés</button>
-    </ng-container>
-  </ng-template>
+  <ng-container *ngIf="isLargeScreen">
+    <div class="desktop-menu">
+      <div class="left">
+        <a (click)="homepage()"
+          ><img src="assets/toilet_marker.png" alt="logo"
+        /></a>
+        <a (click)="homepage()"><span>HolVanMosdó?</span></a>
+      </div>
+      <div class="center">
+        <mat-form-field
+          class="search"
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
+          <mat-label>Keresés</mat-label>
+          <input
+            matInput
+            placeholder="Település"
+            [formControl]="searchControl"
+            (keyup.enter)="onSearch()"
+          />
+          <mat-error *ngIf="errorMessage">
+            {{ errorMessage }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="right">
+        <a mat-button routerLink="/">Térkép</a>
+        <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
+          <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
+        </ng-container>
+
+        <ng-template #loginBlock>
+          <ng-container *ngIf="auth.user$ | async as user">
+            <a mat-button *ngIf="user.role === 'admin'" routerLink="/admin"
+              >Admin</a
+            >
+            <a mat-button routerLink="/profile">Profil</a>
+            <button mat-button (click)="logout()">Kijelentkezés</button>
+          </ng-container>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
 </mat-toolbar>
