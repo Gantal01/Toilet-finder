@@ -131,11 +131,11 @@ export class ApiService {
   }
 
   getToiletsAdmin(query: string): Observable<any>{
-    return this.http.get<{}>(`${environment.apiUrl}/bela?q=${encodeURIComponent(query)}`)
+    return this.http.get<{}>(`${environment.apiUrl}/admin/toiletquery?q=${encodeURIComponent(query)}`)
   }
 
   getUsersAdmin(query: string): Observable<any>{
-    return this.http.get<{}>(`${environment.apiUrl}/sanyi?q=${encodeURIComponent(query)}`)
+    return this.http.get<{}>(`${environment.apiUrl}/admin/userquery?q=${encodeURIComponent(query)}`)
   }
 
 }

@@ -56,6 +56,8 @@ app.get("/toilets/:id", async (req, res) => {
         opening_hours,
         wheelchair,
         fee,
+        added_by,
+        approved_by,
         hstore_to_json(extra_info) AS extra_info,
         ST_X(location::geometry) AS lon,    
         ST_Y(location::geometry) AS lat
@@ -978,7 +980,7 @@ app.get("/user/me", (req, res, next) => {
 });
 
 app.get(
-  "/bela",
+  "/admin/toiletquery",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     if (req.user.role !== "admin") {
@@ -1018,7 +1020,7 @@ app.get(
 );
 
 app.get(
-  "/sanyi",
+  "/admin/userquery",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     if (req.user.role !== "admin") {
