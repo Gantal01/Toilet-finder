@@ -115,7 +115,7 @@
             <div *ngIf="slectedToilet.extra_info as extra_info">
               <p>További adatok:</p>
               <div *ngFor="let key of Keys(extra_info)">
-                <p>{{ key }}: {{ extra_info[key] }}</p>
+                <p>{{ tag.keyToHun(key) }}: {{ tag.valueToHUN(extra_info[key]) }}</p>
               </div>
             </div>
           </mat-card-content>

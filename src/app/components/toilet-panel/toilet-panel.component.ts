@@ -23,6 +23,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Rating } from '../../models/rating';
 import { Toilet } from '../../models/toilet';
+import {TagDictionaryService} from '../../services/tag-dictionary.service';
 
 @Component({
   selector: 'app-toilet-panel',
@@ -62,7 +63,10 @@ export class ToiletPanelComponent implements OnChanges {
 
   isFromCurrent: boolean = false;
 
-  constructor(private api: ApiService, public auth: AuthService) {}
+  Keys = Object.keys;
+
+
+  constructor(private api: ApiService, public auth: AuthService, public tag: TagDictionaryService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['toilet'] && this.toilet) {

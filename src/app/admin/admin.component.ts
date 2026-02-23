@@ -22,6 +22,7 @@ import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { debounceTime, startWith } from 'rxjs';
+import {TagDictionaryService} from '../services/tag-dictionary.service';
 
 @Component({
   selector: 'app-admin',
@@ -66,7 +67,7 @@ export class AdminComponent implements OnInit {
   searchControlUser = new FormControl<string>('', {nonNullable: true});
   searchControlToilet = new FormControl<string>('', {nonNullable: true});
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, public tag: TagDictionaryService) {}
 
   ngOnInit(): void {
     this.searchControlToilet.valueChanges
@@ -83,7 +84,7 @@ export class AdminComponent implements OnInit {
       });
 
     this.searchControlUser.valueChanges
-      .pipe(startWith("") ,debounceTime(300))
+      .pipe(startWith(""), debounceTime(300))
       .subscribe((value) => {
         const q = (value ?? '').trim();
         this.api.getUsersAdmin(q).subscribe({

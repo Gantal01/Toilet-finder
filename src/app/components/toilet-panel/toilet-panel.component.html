@@ -14,6 +14,12 @@
   <p>Üzemeltető: {{ toilet.operator || "Nincs megadva" }}</p>
   <p>Mozgáskorlátozott: {{ toilet.wheelchair || "Nincs megadva" }}</p>
   <p>Nyitvatartás: {{ toilet.opening_hours || "Nincs megadva" }}</p>
+  <div *ngIf="toilet.extra_info as extra_info">
+    <p>További adatok:</p>
+    <div *ngFor="let key of Keys(extra_info)">
+        <p>{{ tag.keyToHun(key) }}: {{ tag.valueToHUN(extra_info[key])}}</p>
+    </div>
+  </div>
   <br />
   <mat-divider></mat-divider>
   <h4>Útvonaltervezés</h4>
