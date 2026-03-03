@@ -57,13 +57,13 @@
         </mat-form-field>
       </div>
       <div class="right">
-        <a mat-button routerLink="/">Térkép</a>
         <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loginBlock">
           <a mat-button (click)="loginWithGoogle()">Bejelentkezés</a>
         </ng-container>
 
         <ng-template #loginBlock>
           <ng-container *ngIf="auth.user$ | async as user">
+            <a mat-button routerLink="/">Térkép</a>
             <a mat-button *ngIf="user.role === 'admin'" routerLink="/admin"
               >Admin</a
             >

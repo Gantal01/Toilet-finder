@@ -8,18 +8,35 @@
   padding-right: 10%;
 }
 
-.listElement {
+.list-element {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;  
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 70vh;
+
 }
-.listItem {
+
+.list-element mat-card {
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.list-element mat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
 .ratings-list {
-  max-height: 250px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 6px;
+
+}
+
+.selected-card{
+  background-color: lightgray;
+  border: 2px solid;
 }
 
 .rating-item {
@@ -29,4 +46,76 @@
 
 .rating-item:last-child {
   border-bottom: none;
+}
+
+.admin-page{
+  padding: 30px 8vw;
+  margin: 0 auto;
+  height: calc(100vh - 160px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-split{
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  align-items: start;
+  column-gap: 60px;
+  flex: 1 1 auto;
+  min-height: 0;
+
+}
+
+.admin-split.single{
+  grid-template-columns: 360px; 
+}
+
+@media (max-width: 900px){
+  .admin-split{
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-list{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  overflow-y: auto;
+
+
+}
+.panel-details{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  overflow-y: auto;
+
+}
+
+.card-detail{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+.card-detail button{
+  align-self: center;
+  width: 150px;
+  border: 2px solid;
+}
+
+.searchbar{
+  display: flex;
+  justify-content: center;
+}
+
+.panel-details{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
 }

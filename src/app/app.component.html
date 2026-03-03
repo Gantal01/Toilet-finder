@@ -1,11 +1,13 @@
-<mat-sidenav-container class="app-shell">
+<div class="app-shell">
+<mat-sidenav-container >
   <mat-sidenav #sidenav [mode]="'over'" class="app-sidenav">
     <app-sidenav-menu (navigate)="sidenav.toggle()"> </app-sidenav-menu>
   </mat-sidenav>
-  <mat-card-content class="app-main">
+  <mat-sidenav-content class="app-main">
     <app-navbar (menuClick)="sidenav.toggle()"></app-navbar>
     <div class="app-content">
       <router-outlet></router-outlet>
     </div>
-  </mat-card-content>
+  </mat-sidenav-content>
 </mat-sidenav-container>
+</div>

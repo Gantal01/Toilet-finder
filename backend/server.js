@@ -552,6 +552,7 @@ app.get("/newToilets/:id", async (req, res) => {
         opening_hours,
         wheelchair,
         fee,
+        added_by,
         hstore_to_json(extra_info) AS extra_info,
         ST_X(location::geometry) AS lon,    
         ST_Y(location::geometry) AS lat

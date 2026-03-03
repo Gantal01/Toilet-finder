@@ -391,7 +391,7 @@ export class AdminComponent implements OnInit {
   }
 
   deleteUserByAdmin(user_id: number) {
-    if (!confirm('Biztoan törli a felhasználót?')) {
+    if (!confirm('Biztosan törli a felhasználót?')) {
       return;
     }
 
