@@ -329,8 +329,8 @@ export class AdminComponent implements OnInit {
 
     let extraObj: any = {};
     try {
-      extraObj = JSON.parse(this.extraInfoText || '{}');
-    } catch {
+      extraObj = JSON.parse(this.extraInfoText || '{}');      
+    } catch(e) {
       alert('Hibás extrainfo!');
       return;
     }

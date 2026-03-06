@@ -2,8 +2,14 @@
   width: 100%;
   justify-content: center;
 }
+
 .sidenav-menu {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+h2 {
+  align-self: center;
+  padding-top: 20px;
 }

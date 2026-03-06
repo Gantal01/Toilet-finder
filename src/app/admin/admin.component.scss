@@ -1,20 +1,12 @@
-.nameContainer {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  flex-basis: 400px;
-  justify-content: space-between;
-  padding-left: 10%;
-  padding-right: 10%;
-}
-
 .list-element {
   display: flex;
   flex-direction: column;
-  gap: 12px;  
+  gap: 12px;
   overflow-y: auto;
   max-height: 70vh;
-
+  padding: 6px 6px 6px 6px;
+  background-color: lightskyblue;
+  border-radius: 10px;
 }
 
 .list-element mat-card {
@@ -24,31 +16,25 @@
 
 .list-element mat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .ratings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   max-height: 400px;
   overflow-y: auto;
   padding-right: 6px;
-
+  padding-left: 6px;
 }
 
-.selected-card{
+.selected-card {
   background-color: lightgray;
   border: 2px solid;
 }
 
-.rating-item {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 8px 0;
-}
-
-.rating-item:last-child {
-  border-bottom: none;
-}
-
-.admin-page{
+.admin-page {
   padding: 30px 8vw;
   margin: 0 auto;
   height: calc(100vh - 160px);
@@ -57,65 +43,114 @@
   flex-direction: column;
 }
 
-.admin-split{
+.admin-split {
   display: grid;
   grid-template-columns: 360px 1fr;
   align-items: start;
-  column-gap: 60px;
+  gap: 24px 60px;
   flex: 1 1 auto;
   min-height: 0;
-
 }
 
-.admin-split.single{
-  grid-template-columns: 360px; 
+.admin-split.single {
+  grid-template-columns: 360px;
 }
 
-@media (max-width: 900px){
-  .admin-split{
+@media (max-width: 900px) {
+  .admin-split {
     grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .list-element {
+    max-height: 32vh;
+  }
+
+  .ratings-list {
+    max-height: 28vh;
   }
 }
 
-.panel-list{
+.panel-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
   overflow-y: auto;
-
-
 }
-.panel-details{
+
+.panel-details {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
   overflow-y: auto;
-
 }
 
-.card-detail{
+.card-detail {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 10px;
 }
 
-.card-detail button{
+.card-detail button {
   align-self: center;
   width: 150px;
   border: 2px solid;
 }
 
-.searchbar{
+.searchbar {
   display: flex;
   justify-content: center;
 }
 
-.panel-details{
+.edit-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .edit-form {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.field {
+  width: 100%;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.toggles {
+  grid-column: 1 / -1;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+h2 {
+  align-self: center;
+}
+
+.field-button {
+  display: flex;
+  column-gap: 20px;
+  justify-content: center;
+  gap: 20px;
+}
+
+mat-divider {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.panel-infotext {
+  align-self: center;
+  margin-bottom: 50px;
 }
