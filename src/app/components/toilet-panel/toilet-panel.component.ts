@@ -23,7 +23,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Rating } from '../../models/rating';
 import { Toilet } from '../../models/toilet';
-import {TagDictionaryService} from '../../services/tag-dictionary.service';
+import { TagDictionaryService } from '../../services/tag-dictionary.service';
+import {
+  MatExpansionModule,
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
+import { MatCard, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-toilet-panel',
@@ -42,6 +50,13 @@ import {TagDictionaryService} from '../../services/tag-dictionary.service';
     AsyncPipe,
     MatButtonModule,
     MatSlideToggle,
+    MatButtonModule,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatCard,
+    MatCardContent,
   ],
   templateUrl: './toilet-panel.component.html',
   styleUrl: './toilet-panel.component.scss',
@@ -65,8 +80,11 @@ export class ToiletPanelComponent implements OnChanges {
 
   Keys = Object.keys;
 
-
-  constructor(private api: ApiService, public auth: AuthService, public tag: TagDictionaryService) {}
+  constructor(
+    private api: ApiService,
+    public auth: AuthService,
+    public tag: TagDictionaryService,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['toilet'] && this.toilet) {
@@ -80,12 +98,12 @@ export class ToiletPanelComponent implements OnChanges {
       });
     }
 
-    if(changes['calculatedRoute']){
-        if(this.calculatedRoute){
-          this.routePanel = true;
-        }else{
-          this.routePanel = false;
-        }
+    if (changes['calculatedRoute']) {
+      if (this.calculatedRoute) {
+        this.routePanel = true;
+      } else {
+        this.routePanel = false;
+      }
     }
   }
 
@@ -110,6 +128,10 @@ export class ToiletPanelComponent implements OnChanges {
   }
 
   submitRating() {
+    if (!confirm('Biztosan beküldöd ezt a véleményt?')) {
+      return;
+    }
+
     if (!this.toilet || this.userRating === 0) {
       alert('Adj meg értékelést is!');
       return;
@@ -138,7 +160,11 @@ export class ToiletPanelComponent implements OnChanges {
       });
   }
 
-   submitSuggestion() {
+  submitSuggestion() {
+    if (!confirm('Biztosan beküldöd ezt a javaslatot?')) {
+      return;
+    }
+
     if (!this.toilet) {
       return;
     }

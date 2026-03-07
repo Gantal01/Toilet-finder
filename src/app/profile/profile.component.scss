@@ -10,6 +10,9 @@
   width: 100%;
   max-width: min(2000px, 90%);
   padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .ratings-section {
@@ -36,9 +39,16 @@
 }
 
 .delete-profile {
-  margin-top: 24px;
+  width: 100%;
+  padding-top: 24px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  padding-bottom: 24px;
+  box-sizing: border-box;
+}
+
+.delete-profile button{
+  border: 2px solid;
 }
 
 .rating-item:last-child {

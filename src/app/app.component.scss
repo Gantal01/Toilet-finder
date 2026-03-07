@@ -14,7 +14,8 @@ mat-sidenav-container {
 .app-content {
   flex: 1 1 auto;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
 }
 

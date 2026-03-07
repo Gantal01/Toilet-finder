@@ -1,116 +1,167 @@
 <div class="infopanel" *ngIf="toilet">
   <button mat-button (click)="close.emit()">X</button>
 
-  <h4>Illemehely adatai</h4>
+  <h2>Mosdó adatai</h2>
 
-  <app-star-rating [rating]="averageRating" [readonly]="true">
-  </app-star-rating>
-  <p>{{ ratingCount }} értékelés</p>
-  <button mat-button (click)="openMap.emit()">Google maps</button>
+  <div class="panel-summary">
+    <app-star-rating [rating]="averageRating" [readonly]="true">
+    </app-star-rating>
+    <p>{{ ratingCount }} értékelés alapján</p>
+  </div>
+
+  <ng-container *ngIf="auth.user$ | async as user">
+    <ng-container *ngIf="user.role === 'admin'">
+      <p>OSM_ID: {{ toilet.osm_id || "Nem OSM adatbázisból" }}</p>
+      <p>Toilet_ID: {{ toilet.toilet_id || "Nincs megadva" }}</p>
+    </ng-container>
+  </ng-container>
 
   <p>Név: {{ toilet.name || "Nincs megadva" }}</p>
-  <p>OSM_ID: {{ toilet.osm_id || "Nincs megadva" }}</p>
   <p>Díj: {{ toilet.fee || "Nincs megadva" }}</p>
   <p>Üzemeltető: {{ toilet.operator || "Nincs megadva" }}</p>
   <p>Mozgáskorlátozott: {{ toilet.wheelchair || "Nincs megadva" }}</p>
   <p>Nyitvatartás: {{ toilet.opening_hours || "Nincs megadva" }}</p>
+
   <div *ngIf="toilet.extra_info as extra_info">
     <p>További adatok:</p>
     <div *ngFor="let key of Keys(extra_info)">
-        <p>{{ tag.keyToHun(key) }}: {{ tag.valueToHUN(extra_info[key])}}</p>
+      <p>{{ tag.keyToHun(key) }}: {{ tag.valueToHUN(extra_info[key]) }}</p>
     </div>
   </div>
-  <br />
-  <mat-divider></mat-divider>
-  <h4>Útvonaltervezés</h4>
 
-  <mat-radio-group
-    aria-label="profile"
-    [value]="transportMode"
-    (change)="onModeChange($event)"
-  >
-    <mat-radio-button value="shortest">Gyalog</mat-radio-button>
-    <mat-radio-button value="mtb">Kerékpár</mat-radio-button>
-    <mat-radio-button value="car-vario">Autó</mat-radio-button>
-  </mat-radio-group>
-  <br />
-
-  <button
-    mat-button
-    (click)="
-      isFromCurrent ? startRouteFromCurrentLocation.emit() : startRoute.emit()
-    "
-  >
-    Útvonaltervezés
-  </button>
-  <mat-slide-toggle [(ngModel)]="isFromCurrent"></mat-slide-toggle>Tartózkodási
-  helytől<br />
-  <div *ngIf="routePanel">
-    <br />
-    <p>{{ time }} perc, {{ distance }} km</p>
-    <button mat-button (click)="googleRoute.emit()">Google Mapsben</button>
-    <button mat-button (click)="downloadGpx.emit()">.gpx fájl letöltése</button
-    ><br />
-    <br />
+  <div class="panel-summary">
+    <button mat-button (click)="openMap.emit()">Google Térkép</button>
     <mat-divider></mat-divider>
   </div>
 
-  <br />
+  <mat-accordion multi>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        ><mat-panel-title
+          >Útvonaltervezés</mat-panel-title
+        ></mat-expansion-panel-header
+      >
+      <div class="route-controls">
+        <mat-radio-group
+          aria-label="profile"
+          [value]="transportMode"
+          (change)="onModeChange($event)"
+        >
+          <mat-radio-button value="shortest">Gyalog</mat-radio-button>
+          <mat-radio-button value="mtb">Kerékpár</mat-radio-button>
+          <mat-radio-button value="car-vario">Autó</mat-radio-button>
+        </mat-radio-group>
 
-  <div class="ratings-section">
-    <h4>Vélemények</h4>
+        <mat-slide-toggle [(ngModel)]="isFromCurrent"
+          >Tartózkodási helytől</mat-slide-toggle
+        >
 
-    <div class="ratings-list">
-      <div *ngFor="let rat of ratings">
-        <p>{{ rat.user_name }}</p>
-        <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
-        <app-star-rating [rating]="rat.value" [readonly]="true">
-        </app-star-rating>
-        <p>{{ rat.description }}</p>
+        <button
+          mat-button
+          (click)="
+            isFromCurrent
+              ? startRouteFromCurrentLocation.emit()
+              : startRoute.emit()
+          "
+        >
+          Útvonaltervezés
+        </button>
+
+        <div *ngIf="routePanel">
+          <p>{{ time }} perc, {{ distance }} km</p>
+          <button mat-button (click)="googleRoute.emit()">
+            Google Mapsben
+          </button>
+          <button mat-button (click)="downloadGpx.emit()">
+            .gpx fájl letöltése
+          </button>
+        </div>
       </div>
-      <br />
-    </div>
-  </div>
-  <br />
-  <mat-divider></mat-divider>
-  <br />
-  <div *ngIf="auth.isLoggedIn$ | async; else loginRequired">
-    <h4>Írjon véleményt</h4>
+    </mat-expansion-panel>
 
-    <app-star-rating [(rating)]="userRating"> </app-star-rating>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        ><mat-panel-title
+          >Vélemények</mat-panel-title
+        ></mat-expansion-panel-header
+      >
 
-    <form class="example-form">
-      <mat-form-field class="example-full-width">
-        <mat-label>Írj véleményt</mat-label>
-        <textarea
-          matInput
-          placeholder="Írd le a véleményed erről az illemhelyről"
-          [(ngModel)]="description"
-          name="description"
-        ></textarea>
-      </mat-form-field>
-    </form>
-    <button mat-button (click)="submitRating()" [disabled]="userRating === 0">
-      Küldés</button
-    ><br />
-    <mat-divider></mat-divider>
-    <h4>Módosítási javaslat</h4>
-    <form class="example-form">
-      <mat-form-field class="example-full-width">
-        <mat-label>Módosítási javaslat</mat-label>
-        <textarea
-          matInput
-          placeholder="Írd le a módosítási javaslatod!"
-          [(ngModel)]="suggestion"
-          name="suggestion"
-        ></textarea>
-      </mat-form-field>
-    </form>
-    <button mat-button (click)="submitSuggestion()">Küldés</button>
-  </div>
+      <div class="ratings-section">
+        <div class="ratings-list">
+          <div *ngFor="let rat of ratings">
+            <mat-card>
+              <mat-card-content>
+                <div class="rating-header">
+                <p>{{ rat.user_name }}</p>
+                
+                <app-star-rating [rating]="rat.value" [readonly]="true">
+                </app-star-rating>
+                <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
+                </div>
+                <p>{{ rat.description || "Az értékelő nem írt megjegyzést" }}</p>
+                
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
 
-  <ng-template #loginRequired>
-    <h4>Írjon véleményt</h4>
-    <p>Értékeléshez bejelntkezés szükséges</p>
-  </ng-template>
+      <mat-divider></mat-divider>
+
+      <div *ngIf="auth.isLoggedIn$ | async; else loginRequired">
+        <h2>Írjon véleményt</h2>
+
+        <app-star-rating [(rating)]="userRating"> </app-star-rating>
+
+        <form class="example-form">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Írj véleményt</mat-label>
+            <textarea
+              matInput
+              placeholder="Írd le a véleményed erről az illemhelyről"
+              [(ngModel)]="description"
+              name="description"
+            ></textarea>
+          </mat-form-field>
+        </form>
+        <button
+          mat-button
+          (click)="submitRating()"
+          [disabled]="userRating === 0"
+        >
+          Küldés
+        </button>
+      </div>
+
+      <ng-template #loginRequired>
+        <p>Értékeléshez bejelntkezés szükséges</p>
+      </ng-template>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        ><mat-panel-title
+          >Módosítási javaslat</mat-panel-title
+        ></mat-expansion-panel-header
+      >
+      <div *ngIf="auth.isLoggedIn$ | async; else loginRequiredSuggestion">
+        <form class="example-form">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Módosítási javaslat</mat-label>
+            <textarea
+              matInput
+              placeholder="Írd le a módosítási javaslatod!"
+              [(ngModel)]="suggestion"
+              name="suggestion"
+            ></textarea>
+          </mat-form-field>
+        </form>
+        <button mat-button (click)="submitSuggestion()">Küldés</button>
+      </div>
+
+      <ng-template #loginRequiredSuggestion>
+        <p>Módosítási javasléaathoz bejelntkezés szükséges</p>
+      </ng-template>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>
