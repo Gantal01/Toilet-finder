@@ -1,3 +1,17 @@
+.profile-page {
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: min(2000px, 90%);
+  padding: 24px;
+}
+
 .ratings-section {
   margin-top: 12px;
 }
@@ -6,13 +20,57 @@
   max-height: 500px;
   overflow-y: auto;
   padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.rating-item {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 8px 0;
+.rating-card {
+  padding: 16px;
+}
+
+.rating-card button {
+  align-self: center;
+  width: 150px;
+  border: 2px solid;
+}
+
+.delete-profile {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .rating-item:last-child {
   border-bottom: none;
+}
+
+h2 {
+  align-self: center;
+  padding-top: 20px;
+}
+
+.panel-infotext {
+  align-self: center;
+}
+
+mat-divider {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.field-button {
+  display: flex;
+  column-gap: 20px;
+  justify-content: center;
+  gap: 20px;
+}
+
+.action-button {
+  width: min(300px, 90%);
+  border: 2px solid;
+}
+
+.profil-text {
+  text-align: center;
 }

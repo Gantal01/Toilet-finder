@@ -13,8 +13,9 @@
       </div>
       <div class="admin-split">
         <div class="panel-list">
-          <mat-card>
+          <mat-card>            
             <div class="list-element">
+              <h2>Felhasználók</h2>
               <div *ngFor="let user of users">
                 <mat-card
                   *ngIf="!user.is_deleted"
@@ -33,6 +34,7 @@
         </div>
         <div class="panel-details" *ngIf="selectedUser !== null">
           <mat-card>
+            <h2>Felhasználó adatai</h2>
             <mat-card-content class="card-detail">
               <p>GoogleID: {{ selectedUser.google_id }}</p>
               <p>Név: {{ selectedUser.name }}</p>
@@ -88,6 +90,7 @@
         <div class="panel-list">
           <mat-card>
             <div class="list-element">
+              <h2>Mosdók</h2>
               <div *ngFor="let toilet of toilets">
                 <mat-card
                   (click)="!modifyTrigger && getToiletDetails(toilet.toilet_id)"
@@ -249,6 +252,7 @@
         <div class="panel-list">
           <mat-card>
             <div class="list-element">
+              <h2>Új javaslatok</h2>
               <div *ngFor="let toilet of newToilets">
                 <mat-card
                   (click)="getNewToiletDetails(toilet.toilet_id)"
@@ -266,6 +270,7 @@
         </div>
         <div class="panel-details" *ngIf="slectedToilet !== null">
           <mat-card>
+            <h2>Mosdó adatai</h2>
             <mat-card-content class="card-detail">
               <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
               <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
@@ -295,7 +300,7 @@
                   </p>
                 </div>
               </div>
-
+              <div class="field-button">
               <button
                 mat-button
                 (click)="approveToilet(slectedToilet.toilet_id)"
@@ -308,6 +313,7 @@
               >
                 Elutasítás
               </button>
+              </div>
             </mat-card-content>
           </mat-card>
         </div>
@@ -320,6 +326,7 @@
         <div class="panel-list">
           <mat-card>
             <div class="list-element">
+              <h2>Módosítási javaslatok</h2>
               <div *ngFor="let suggestion of suggestions" class="listItem">
                 <mat-card
                   (click)="!modifyTrigger && setSuggestion(suggestion)"

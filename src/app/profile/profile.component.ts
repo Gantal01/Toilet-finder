@@ -10,7 +10,8 @@ import { StarRatingComponent } from '../components/star-rating/star-rating.compo
 import { MatDividerModule } from '@angular/material/divider';
 import { Rating } from '../models/rating';
 import { User } from '../models/user';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { MatCard } from '@angular/material/card';
 
 @Component({
   selector: 'app-profile',
@@ -26,6 +27,7 @@ import {Router} from '@angular/router';
     DatePipe,
     NgFor,
     MatDividerModule,
+    MatCard,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -44,7 +46,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private api: ApiService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -147,16 +149,16 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-    deleteUser(){
-      if (!confirm('Biztosan törölni akarja a profilját?')) {
-        return;
-      }
+  deleteUser() {
+    if (!confirm('Biztosan törölni akarja a profilját?')) {
+      return;
+    }
     this.api.deleteUser().subscribe({
-      next: () =>{
+      next: () => {
         this.auth.logout();
         this.router.navigate(['']);
       },
       error: (err) => console.error(err),
-    })
+    });
   }
 }

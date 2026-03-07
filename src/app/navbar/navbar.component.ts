@@ -2,7 +2,7 @@ import { Component, HostListener, Output, EventEmitter } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, RouterLinkActive } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
@@ -25,7 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
     ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
-  ],
+    RouterLinkActive
+],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })

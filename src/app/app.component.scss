@@ -7,6 +7,10 @@ app-navbar {
   flex: 0 0 auto;
 }
 
+mat-sidenav-container {
+  height: 100%;
+}
+
 .app-content {
   flex: 1 1 auto;
   position: relative;
@@ -25,7 +29,7 @@ app-navbar {
 }
 
 .app-main {
-  height: 100vh;
+  height: 100%;
   display: flex;
   min-height: 0;
   flex-direction: column;

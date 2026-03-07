@@ -63,11 +63,23 @@
 
         <ng-template #loginBlock>
           <ng-container *ngIf="auth.user$ | async as user">
-            <a mat-button routerLink="/">Térkép</a>
-            <a mat-button *ngIf="user.role === 'admin'" routerLink="/admin"
+            <a
+              mat-button
+              routerLink="/"
+              routerLinkActive="active-link"
+              [routerLinkActiveOptions]="{ exact: true }"
+              >Térkép</a
+            >
+            <a
+              mat-button
+              *ngIf="user.role === 'admin'"
+              routerLink="/admin"
+              routerLinkActive="active-link"
               >Admin</a
             >
-            <a mat-button routerLink="/profile">Profil</a>
+            <a mat-button routerLink="/profile" routerLinkActive="active-link"
+              >Profil</a
+            >
             <button mat-button (click)="logout()">Kijelentkezés</button>
           </ng-container>
         </ng-template>

@@ -1,78 +1,120 @@
-<div *ngIf="user && formTrigger === false">
-  <p>Name: {{ user.name }}</p>
-  <p>Email: {{ user.email }}</p>
-  <p *ngIf="user.role === 'admin'">Szerepkör: {{ user.role }}</p>
-  <p *ngIf="user.nickname">Nickname: {{ user.nickname }}</p>
-  <p *ngIf="!user.nickname">Nickname: Nincs megadva</p>
-  <button mat-button (click)="formTriggerFunc()">Nickname módosítása</button>
-</div>
+<div class="profile-page">
+  <mat-card class="profile-card">
+    <h2>Profil</h2>
+    <div *ngIf="user && formTrigger === false" class="profil-text">
+      <p>Name: {{ user.name }}</p>
+      <p>Email: {{ user.email }}</p>
+      <p *ngIf="user.role === 'admin'">Szerepkör: {{ user.role }}</p>
+      <p *ngIf="user.nickname">Nickname: {{ user.nickname }}</p>
+      <p *ngIf="!user.nickname">Nickname: Nincs megadva</p>
+      <button mat-button class="action-button" (click)="formTriggerFunc()">
+        Nickname módosítása
+      </button>
+    </div>
 
-<div *ngIf="user && formTrigger === true">
-  <p>Name: {{ user.name }}</p>
-  <p>Email: {{ user.email }}</p>
-  <form class="example-form" (ngSubmit)="setNewNickname()">
-    <mat-form-field class="example-full-width">
-      <mat-label>Adj meg becenevet:</mat-label>
-      <input
-        matInput
-        [(ngModel)]="newNickname"
-        placeholder="Új becenév"
-        name="nickname"
-      />
-    </mat-form-field>
-  <button mat-button type="submit">Mentés</button>
-  <button mat-button type="button" (click)="formTriggerFunc()">Mégse</button>
-  <button mat-button type="button" (click)="removeNickname()">Ninckname törlése</button>
-  </form>
-</div>
-
-<div class="ratings-section">
-  <h4>Vélemények</h4>
-
-  <div class="ratings-list">
-    <div *ngFor="let rat of ratings">
-      <div *ngIf="editingRatingId !== rat.rating_id">
-        <p>Név/id: {{ rat.toilet_id }}</p>
-        <p>{{ rat.creation_time | date : "yyyy. MM. dd." }}</p>
-        <app-star-rating [rating]="rat.value" [readonly]="true">
-        </app-star-rating>
-        <p>{{ rat.description }}</p>
-
-        <button mat-button (click)="modifyRating(rat.rating_id)">
-          Módosítás
-        </button>
-        <button mat-button (click)="deleteRating(rat.rating_id)">Törlés</button>
-
-        <mat-divider></mat-divider>
-        <br />
-      </div>
-
-      <div *ngIf="editingRatingId === rat.rating_id">
-        <p>Név/id: {{ rat.toilet_id }}</p>
-        <app-star-rating [(rating)]="rat.value"> </app-star-rating>
-        <mat-form-field class="example-full-width">
-          <mat-label>Vélemény módosítása</mat-label>
-          <textarea
+    <div *ngIf="user && formTrigger === true" class="profil-text">
+      <p>Name: {{ user.name }}</p>
+      <p>Email: {{ user.email }}</p>
+      <p *ngIf="user.role === 'admin'">Szerepkör: {{ user.role }}</p>
+      <form class="example-form" (ngSubmit)="setNewNickname()">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Adj meg becenevet:</mat-label>
+          <input
             matInput
-            placeholder="rat.description"
-            [(ngModel)]="rat.description"
-            name="description"
-          ></textarea>
+            [(ngModel)]="newNickname"
+            placeholder="Új becenév"
+            name="nickname"
+          />
         </mat-form-field>
-        <br />
+        <div class="field-button">
+          <button mat-button class="action-button" type="submit">Mentés</button>
+          <button
+            mat-button
+            class="action-button"
+            type="button"
+            (click)="formTriggerFunc()"
+          >
+            Mégse
+          </button>
+          <button
+            mat-button
+            type="button"
+            color="warn"
+            (click)="removeNickname()"
+            class="action-button"
+          >
+            Ninckname törlése
+          </button>
+        </div>
+      </form>
+    </div>
 
-        <button mat-button (click)="cancelEditing()">Mégse</button>
-        <button mat-button (click)="saveRating(rat)">Mentés</button>
+    <mat-divider></mat-divider>
+    <h2>Vélemények</h2>
+    <p class="panel-infotext" *ngIf="!ratings.length">
+      Még nem írtál véleményt.
+    </p>
 
-        <mat-divider></mat-divider>
-        <br />
+    <div class="ratings-section">
+      <div class="ratings-list">
+        <div *ngFor="let rat of ratings">
+          <mat-card class="rating-card">
+            <div *ngIf="editingRatingId !== rat.rating_id">
+              <p>Név/id: {{ rat.toilet_id }}</p>
+              <p>{{ rat.creation_time | date: "yyyy. MM. dd." }}</p>
+              <app-star-rating [rating]="rat.value" [readonly]="true">
+              </app-star-rating>
+              <p>{{ rat.description }}</p>
+
+              <div class="field-button">
+                <button mat-button (click)="modifyRating(rat.rating_id)">
+                  Módosítás
+                </button>
+                <button
+                  mat-button
+                  color="warn"
+                  (click)="deleteRating(rat.rating_id)"
+                >
+                  Törlés
+                </button>
+              </div>
+            </div>
+          </mat-card>
+
+          <div *ngIf="editingRatingId === rat.rating_id">
+            <p>Név/id: {{ rat.toilet_id }}</p>
+            <app-star-rating [(rating)]="rat.value"> </app-star-rating>
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Vélemény módosítása</mat-label>
+              <textarea
+                matInput
+                placeholder="rat.description"
+                [(ngModel)]="rat.description"
+                name="description"
+                row="3"
+              ></textarea>
+            </mat-form-field>
+
+            <div class="field-button">
+              <button mat-button (click)="cancelEditing()">Mégse</button>
+              <button mat-button (click)="saveRating(rat)">Mentés</button>
+            </div>
+            <mat-divider></mat-divider>
+          </div>
+        </div>
       </div>
     </div>
-    <br />
-  </div>
-</div>
- <button mat-button (click)="deleteUser()">Profil törlése</button>
+    <mat-divider></mat-divider>
+    <div class="field-button">
+      <div class="delete-profile">
+        <button mat-button color="warn" (click)="deleteUser()">
+          Profil törlése
+        </button>
+      </div>
+    </div>
+  </mat-card>
 
-<div *ngIf="!user">
-  <p>Betöltés....</p>
+  <div *ngIf="!user">
+    <p>Betöltés....</p>
+  </div>
 </div>
