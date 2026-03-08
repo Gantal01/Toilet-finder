@@ -84,7 +84,9 @@
               </div>
             </mat-card>
 
+             
             <div *ngIf="editingRatingId === rat.rating_id">
+              <mat-card class="rating-card">
               <p>Név/id: {{ rat.toilet_id }}</p>
               <app-star-rating [(rating)]="rat.value"> </app-star-rating>
               <mat-form-field class="example-full-width" appearance="outline">
@@ -97,12 +99,13 @@
                   row="3"
                 ></textarea>
               </mat-form-field>
+              
 
               <div class="field-button">
-                <button mat-button (click)="cancelEditing()">Mégse</button>
                 <button mat-button (click)="saveRating(rat)">Mentés</button>
+                <button mat-button (click)="cancelEditing()">Mégse</button>
               </div>
-              <mat-divider></mat-divider>
+              </mat-card>
             </div>
           </div>
         </div>

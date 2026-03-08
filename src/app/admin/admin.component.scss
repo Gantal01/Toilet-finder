@@ -30,8 +30,8 @@
 }
 
 .selected-card {
-  background-color: #d9d9d9;
-  border: 2px solid;
+  background-color: #bdbdbd;
+  border: 1px solid;
 }
 
 .admin-page {
@@ -143,6 +143,13 @@ h2 {
   column-gap: 20px;
   justify-content: center;
   gap: 20px;
+  
+}
+
+.field-button button{
+  border: 1px solid #bdbdbd;
+  border-radius: 10px;
+  padding: 6px 18px;
 }
 
 mat-divider {

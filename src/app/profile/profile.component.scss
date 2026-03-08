@@ -76,6 +76,12 @@ mat-divider {
   gap: 20px;
 }
 
+.field-button button {
+  border: 1px solid #bdbdbd;
+  border-radius: 10px;
+  padding: 6px 18px;
+}
+
 .action-button {
   width: min(300px, 90%);
   border: 2px solid;

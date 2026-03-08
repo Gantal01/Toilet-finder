@@ -13,7 +13,7 @@
       </div>
       <div class="admin-split">
         <div class="panel-list">
-          <mat-card>            
+          <mat-card>
             <div class="list-element">
               <h2>Felhasználók</h2>
               <div *ngFor="let user of users">
@@ -42,12 +42,14 @@
               <p>Nickname: {{ selectedUser.nickname }}</p>
               <p>Szerepkör: {{ selectedUser.role }}</p>
               <p>Google ID: {{ selectedUser.google_id }}</p>
-              <button
-                mat-button
-                (click)="deleteUserByAdmin(selectedUser.user_id)"
-              >
-                Felhasználó törlése
-              </button>
+              <div class="field-button">
+                <button
+                  mat-button
+                  (click)="deleteUserByAdmin(selectedUser.user_id)"
+                >
+                  Felhasználó törlése
+                </button>
+              </div>
               <mat-divider></mat-divider>
               <h2>Felhasználó véleményei</h2>
               <p class="panel-infotext" *ngIf="!userRatings.length">
@@ -61,9 +63,11 @@
                     <app-star-rating [rating]="rat.value" [readonly]="true">
                     </app-star-rating>
                     <p>{{ rat.description }}</p>
-                    <button mat-button (click)="deleteRating(rat.rating_id)">
-                      Törlés
-                    </button>
+                    <div class="field-button">
+                      <button mat-button (click)="deleteRating(rat.rating_id)">
+                        Törlés
+                      </button>
+                    </div>
                   </mat-card>
                 </div>
               </div>
@@ -301,18 +305,18 @@
                 </div>
               </div>
               <div class="field-button">
-              <button
-                mat-button
-                (click)="approveToilet(slectedToilet.toilet_id)"
-              >
-                Jóváhagyás
-              </button>
-              <button
-                mat-button
-                (click)="rejectToilet(slectedToilet.toilet_id)"
-              >
-                Elutasítás
-              </button>
+                <button
+                  mat-button
+                  (click)="approveToilet(slectedToilet.toilet_id)"
+                >
+                  Jóváhagyás
+                </button>
+                <button
+                  mat-button
+                  (click)="rejectToilet(slectedToilet.toilet_id)"
+                >
+                  Elutasítás
+                </button>
               </div>
             </mat-card-content>
           </mat-card>
@@ -356,9 +360,11 @@
                   {{ selectedSuggestion.creation_time | date: "yyyy. MM. dd." }}
                 </p>
                 <p>Javaslat: {{ selectedSuggestion.description }}</p>
-                <button mat-button (click)="rejectSuggestion()">
-                  Elutasítás
-                </button>
+                <div class="field-button">
+                  <button mat-button (click)="rejectSuggestion()">
+                    Elutasítás
+                  </button>
+                </div>
               </mat-card-content>
             </mat-card>
           </div>
@@ -407,9 +413,11 @@
                     </p>
                   </div>
                 </div>
-                <button mat-button (click)="setModifyTrigger()">
-                  Módosítás
-                </button>
+                <div class="field-button">
+                  <button mat-button (click)="setModifyTrigger()">
+                    Módosítás
+                  </button>
+                </div>
               </mat-card-content>
             </mat-card>
 

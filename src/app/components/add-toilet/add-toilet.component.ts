@@ -14,6 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { NgFor } from '@angular/common';
+import { MatDivider } from "@angular/material/divider";
 
 type ExtraInfo = { key: string; value: string };
 
@@ -27,7 +28,8 @@ type ExtraInfo = { key: string; value: string };
     FormsModule,
     MatSlideToggle,
     NgFor,
-  ],
+    MatDivider
+],
   templateUrl: './add-toilet.component.html',
   styleUrl: './add-toilet.component.scss',
 })
