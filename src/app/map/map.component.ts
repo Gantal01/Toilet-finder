@@ -12,6 +12,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../services/auth.service';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { AddToiletComponent } from '../components/add-toilet/add-toilet.component';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -52,6 +54,8 @@ export class MapComponent implements AfterViewInit {
 
   private userMarker!: L.Marker;
   private routeLayer!: any;
+  private adminPreviewMarker: L.Marker | null = null;
+
   private selectedToiletLatLng!: L.LatLng;
   private startRouteLatLng: L.LatLng | null = null;
 
@@ -72,11 +76,17 @@ export class MapComponent implements AfterViewInit {
   time: number | null = null;
   calcRoute: boolean = false;
 
+  showBackToAdminButton = false;
+  isAdminPreviewMode = false;
+
+  private destroy$ = new Subject<void>();
+
   constructor(
     private api: ApiService,
     private locationService: LocationService,
     private mapAction: MapActionService,
     public auth: AuthService,
+    private router: Router,
   ) {}
 
   onTransportModeChange(mode: string) {
@@ -120,6 +130,7 @@ export class MapComponent implements AfterViewInit {
             const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
 
             marker.on('click', () => {
+              if (this.isAdminPreviewMode) return;
               this.api.getToiletsById(t.toilet_id).subscribe({
                 next: (fullToilet) => {
                   this.selectedToilet = fullToilet;
@@ -144,9 +155,54 @@ export class MapComponent implements AfterViewInit {
 
     this.currentPosition();
 
-    this.mapAction.jumpTo$.subscribe(({lat, lon, zoom}) => {
+    this.mapAction.jumpTo$.subscribe(({ lat, lon, zoom }) => {
       this.map.setView([lat, lon], zoom);
-    })
+    });
+
+    this.mapAction.adminPreviewToilet$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((action) => {
+        if (!action || !action.toilet) return;
+
+        this.isAdminPreviewMode = true;
+
+        const lat = Number(action.toilet.lat);
+        const lon = Number(action.toilet.lon);
+
+        if (!isFinite(lat) || !isFinite(lon)) {
+          return;
+        }
+
+        const pos: L.LatLngExpression = [lat, lon];
+
+        Promise.resolve().then(() => {
+          this.selectedToilet = action.toilet;
+          this.showBackToAdminButton = action.returnToAdmin;
+        });
+        this.selectedToiletLatLng = L.latLng(lat, lon);
+
+        if (this.adminPreviewMarker) {
+          this.map.removeLayer(this.adminPreviewMarker);
+        }
+
+        const previewIcon = L.icon({
+          iconUrl: 'assets/toilet_marker_new.png',
+          iconSize: [60, 60],
+          iconAnchor: [30, 60],
+          popupAnchor: [0, -60],
+        });
+
+        this.adminPreviewMarker = L.marker(pos, {
+          icon: previewIcon,
+          zIndexOffset: 1000,
+        }).addTo(this.map);
+
+        requestAnimationFrame(() => {
+          this.map.invalidateSize(true);
+          this.map.flyTo(pos, 19, { duration: 1.2 });
+        });
+        this.mapAction.clearAdminPreviewToilet();
+      });
   }
 
   private initMap(): void {
@@ -165,6 +221,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   startRoute() {
+    if (this.isAdminPreviewMode) return;
     if (!this.selectedToilet) return;
 
     this.selectedToiletLatLng = L.latLng(
@@ -194,6 +251,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   calculateRoute(start: L.LatLng, end: L.LatLng) {
+    if (this.isAdminPreviewMode) return;
     this.api.getRoute(start, end, this.transportProfile).subscribe({
       next: (gpxText: string) => {
         console.log('gpx', gpxText);
@@ -208,14 +266,14 @@ export class MapComponent implements AfterViewInit {
         this.lastGpxText = gpxText;
 
         const startIcon = L.icon({
-          iconUrl: 'assets/greenDot.png',
-          iconSize: [30, 30],
-          iconAnchor: [10, 10],
+          iconUrl: 'assets/toilet_marker_start.png',
+          iconSize: [60, 60],
+          iconAnchor: [30, 60],
         });
         const endIcon = L.icon({
-          iconUrl: 'assets/redDot.png',
-          iconSize: [30, 30],
-          iconAnchor: [10, 10],
+          iconUrl: 'assets/toilet_marker_end.png',
+          iconSize: [60, 60],
+          iconAnchor: [30, 60],
         });
 
         // @ts-ignore
@@ -253,6 +311,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   googleRoute() {
+    if (this.isAdminPreviewMode) return;
     if (!this.userMarker || !this.selectedToiletLatLng) {
       alert('Nincs elérhető útvonal!');
       return;
@@ -286,6 +345,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   downloadGpx() {
+    if (this.isAdminPreviewMode) return;
     if (!this.lastGpxText) {
       alert('Nincs letölthető útvonal!');
       return;
@@ -306,6 +366,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   async startRouteFromCurrentLocation() {
+    if (this.isAdminPreviewMode) return;
     if (!this.selectedToilet) {
       return;
     }
@@ -354,6 +415,7 @@ export class MapComponent implements AfterViewInit {
           iconUrl: 'assets/currentPosition.png',
           iconSize: [60, 60],
         }),
+        zIndexOffset: 2000
       }).addTo(this.map);
     } catch (err) {
       console.log('Position error', err);
@@ -361,6 +423,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   async getNearestToilet() {
+    if (this.isAdminPreviewMode) return;
     try {
       const position = await this.locationService.getCurrentLocation();
 
@@ -386,6 +449,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   startAddToiletMode() {
+    if (this.isAdminPreviewMode) return;
     this.lockZoomForPicking();
     this.selectedToilet = null;
     this.addToiletLatLng = null;
@@ -503,5 +567,30 @@ export class MapComponent implements AfterViewInit {
         (this.map as any).tap.disable();
       }
     }
+  }
+
+  backToAdmin() {
+    this.showBackToAdminButton = false;
+
+    if (this.adminPreviewMarker) {
+      (this.map.removeLayer(this.adminPreviewMarker),
+        {
+          state: {
+            selectedToiletId: this.selectedToilet?.toilet_id,
+          },
+        });
+      this.adminPreviewMarker = null;
+    }
+
+    this.isAdminPreviewMode = false;
+
+    this.router.navigate(['/admin'], {
+      queryParamsHandling: 'preserve',
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,4 +1,7 @@
-<mat-tab-group (selectedTabChange)="onTabChange($event)">
+<mat-tab-group
+  [(selectedIndex)]="selectedTabIndex"
+  (selectedTabChange)="onTabChange($event)"
+>
   <mat-tab label="Felhasználók">
     <div class="admin-page">
       <div class="searchbar">
@@ -257,7 +260,10 @@
           <mat-card>
             <div class="list-element">
               <h2>Új javaslatok</h2>
-              <div *ngFor="let toilet of newToilets">
+              <div
+                *ngFor="let toilet of newToilets"
+                [id]="'toilet-' + toilet.toilet_id"
+              >
                 <mat-card
                   (click)="getNewToiletDetails(toilet.toilet_id)"
                   [class.selected-card]="
@@ -304,6 +310,13 @@
                   </p>
                 </div>
               </div>
+
+              <div class="field-button">
+                <button mat-button (click)="showOnMap(slectedToilet)">
+                  Megtekintés térképen
+                </button>
+              </div>
+
               <div class="field-button">
                 <button
                   mat-button

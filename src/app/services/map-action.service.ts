@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { Toilet } from '../models/toilet';
+
+export interface AdminPreviewAction {
+  toilet: Toilet;
+  returnToAdmin: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -14,4 +20,18 @@ export class MapActionService {
   }
 
   jumpTo$ = new Subject<{ lat: number; lon: number; zoom: number }>();
+
+ private adminPreviewToiletSubject =
+    new BehaviorSubject<AdminPreviewAction | null>(null);
+
+  adminPreviewToilet$ = this.adminPreviewToiletSubject.asObservable();
+
+  setAdminPreviewToilet(action: AdminPreviewAction) {
+    this.adminPreviewToiletSubject.next(action);
+  }
+
+  clearAdminPreviewToilet() {
+    this.adminPreviewToiletSubject.next(null);
+  }
+
 }

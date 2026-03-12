@@ -21,8 +21,11 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { debounceTime, startWith } from 'rxjs';
-import {TagDictionaryService} from '../services/tag-dictionary.service';
+import { debounceTime, from, startWith } from 'rxjs';
+import { TagDictionaryService } from '../services/tag-dictionary.service';
+import { Router } from '@angular/router';
+import { MapActionService } from '../services/map-action.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
@@ -64,14 +67,23 @@ export class AdminComponent implements OnInit {
   modifyTrigger: boolean = false;
   editToilet: any = null;
   extraInfoText: string = '';
-  searchControlUser = new FormControl<string>('', {nonNullable: true});
-  searchControlToilet = new FormControl<string>('', {nonNullable: true});
+  searchControlUser = new FormControl<string>('', { nonNullable: true });
+  searchControlToilet = new FormControl<string>('', { nonNullable: true });
+  selectedTabIndex: any;
+  private restoreToiletId: number | null = null;
+  private restoreTabIndex: number | null = null;
 
-  constructor(private api: ApiService, public tag: TagDictionaryService) {}
+  constructor(
+    private api: ApiService,
+    public tag: TagDictionaryService,
+    private router: Router,
+    private mapAction: MapActionService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.searchControlToilet.valueChanges
-      .pipe(startWith("") ,debounceTime(300))
+      .pipe(startWith(''), debounceTime(300))
       .subscribe((value) => {
         const q = (value ?? '').trim();
         this.api.getToiletsAdmin(q).subscribe({
@@ -84,7 +96,7 @@ export class AdminComponent implements OnInit {
       });
 
     this.searchControlUser.valueChanges
-      .pipe(startWith(""), debounceTime(300))
+      .pipe(startWith(''), debounceTime(300))
       .subscribe((value) => {
         const q = (value ?? '').trim();
         this.api.getUsersAdmin(q).subscribe({
@@ -96,7 +108,7 @@ export class AdminComponent implements OnInit {
         });
       });
 
-      this.api.getNewSuggestions().subscribe({
+    this.api.getNewSuggestions().subscribe({
       next: (data) => {
         this.suggestions = data;
       },
@@ -104,6 +116,20 @@ export class AdminComponent implements OnInit {
     });
 
     this.getNewToilets();
+
+    this.route.queryParams.subscribe((params) => {
+      const tab = Number(params['tab']);
+      const toiletId = Number(params['toilet']);
+
+      if (!isNaN(tab)) {
+        this.restoreTabIndex = tab;
+        this.selectedTabIndex = tab;
+      }
+
+      if (!isNaN(toiletId)) {
+        this.restoreToiletId = toiletId;
+      }
+    });
   }
 
   getToiletDetails(toiletID: number) {
@@ -150,11 +176,6 @@ export class AdminComponent implements OnInit {
   getToiletRatings(toiletID: number) {
     this.api.getRatings(toiletID).subscribe({
       next: (ratings) => {
-        console.log('toiletRatings raw:', ratings);
-        console.log(
-          'first item keys:',
-          ratings?.[0] && Object.keys(ratings[0]),
-        );
         this.toiletRatings = ratings;
       },
       error: (err) => console.error('API error', err),
@@ -222,6 +243,24 @@ export class AdminComponent implements OnInit {
     this.api.getNewToilets().subscribe({
       next: (data) => {
         this.newToilets = data;
+
+        if (this.restoreToiletId !== null && this.selectedTabIndex === 2) {
+          const found = this.newToilets.find(
+            (t) => t.toilet_id === this.restoreToiletId,
+          );
+
+          if (found) {
+            this.getNewToiletDetails(this.restoreToiletId);
+
+            setTimeout(() => {
+              const el = document.getElementById(
+                'toilet-' + this.restoreToiletId,
+              );
+            }, 150);
+          }
+
+          this.restoreToiletId = null;
+        }
       },
       error: (err) => console.error('APi error: ', err),
     });
@@ -329,8 +368,8 @@ export class AdminComponent implements OnInit {
 
     let extraObj: any = {};
     try {
-      extraObj = JSON.parse(this.extraInfoText || '{}');      
-    } catch(e) {
+      extraObj = JSON.parse(this.extraInfoText || '{}');
+    } catch (e) {
       alert('Hibás extrainfo!');
       return;
     }
@@ -401,5 +440,27 @@ export class AdminComponent implements OnInit {
       },
       error: (err) => console.error(err),
     });
+  }
+
+  showOnMap(toilet: Toilet) {
+    this.mapAction.setAdminPreviewToilet({
+      toilet,
+      returnToAdmin: true,
+    });
+
+    this.router.navigate(['/'], {
+      queryParams: {
+        tab: 2,
+        toilet: toilet.toilet_id,
+      },
+    });
+  }
+
+  private restoreToiletSelection(toiletId: number) {
+    const found = this.toilets.find((t) => t.toilet_id === toiletId);
+
+    if (!found) return;
+
+    this.getToiletDetails(toiletId);
   }
 }

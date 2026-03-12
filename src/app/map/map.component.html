@@ -19,7 +19,7 @@
         matTooltip="Új mosdó hozzádás"
         (click)="startAddToiletMode()"
       >
-       <img src="assets/toilet_marker.png" width="50" height="50" />
+        <img src="assets/toilet_marker_add.png" width="50" height="50" />
       </button>
     </ng-container>
   </div>
@@ -40,6 +40,10 @@
   </app-toilet-panel>
 
   <div class="center-crosshair" *ngIf="addToiletMode"></div>
+
+  <div class="add-bar" *ngIf="showBackToAdminButton">
+    <button mat-button (click)="backToAdmin()">Vissza</button>
+  </div>
 
   <div class="add-bar" *ngIf="isPickingPosition">
     <button mat-button (click)="confirmPosition()">Pozíció jóváhagyása</button>
