@@ -102,7 +102,7 @@
                 <mat-card
                   (click)="!modifyTrigger && getToiletDetails(toilet.toilet_id)"
                   [class.selected-card]="
-                    slectedToilet?.toilet_id === toilet.toilet_id
+                    selectedToilet?.toilet_id === toilet.toilet_id
                   "
                 >
                   <mat-card-content>
@@ -114,35 +114,35 @@
             </div>
           </mat-card>
         </div>
-        <div class="panel-details" *ngIf="slectedToilet !== null">
+        <div class="panel-details" *ngIf="selectedToilet !== null">
           <mat-card *ngIf="!modifyTrigger">
             <mat-card-content class="card-detail">
               <h2>Mosdó adatai</h2>
-              <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
-              <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
-              <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
-              <p>Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}</p>
-              <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+              <p>Név: {{ selectedToilet.name || "Nincs megadva" }}</p>
+              <p>Toilet ID: {{ selectedToilet.toilet_id || "Nincs megadva" }}</p>
+              <p>OSM ID: {{ selectedToilet.osm_id || "Nincs megadva" }}</p>
+              <p>Üzemeltető: {{ selectedToilet.operator || "Nincs megadva" }}</p>
+              <p>Hozzáférés: {{ selectedToilet.access || "Nincs megadva" }}</p>
               <p>
                 Nyitvatratás:
-                {{ slectedToilet.opening_hours || "Nincs megadva" }}
+                {{ selectedToilet.opening_hours || "Nincs megadva" }}
               </p>
-              <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
-              <p>Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}</p>
+              <p>Pozíció: {{ selectedToilet.lat }}, {{ selectedToilet.lon }}</p>
+              <p>Használati díj: {{ selectedToilet.fee || "Nincs megadva" }}</p>
               <p>
                 Mozgáskorlátozott:
-                {{ slectedToilet.wheelchair || "Nincs megadva" }}
+                {{ selectedToilet.wheelchair || "Nincs megadva" }}
               </p>
-              <p>Jóvágyaott: {{ slectedToilet.approved ? "Igen" : "Nem" }}</p>
+              <p>Jóvágyaott: {{ selectedToilet.approved ? "Igen" : "Nem" }}</p>
               <p>
                 Általa jóváhagyott:
-                {{ slectedToilet.approved_by ?? "OSM adatbázidból" }}
+                {{ selectedToilet.approved_by ?? "OSM adatbázidból" }}
               </p>
               <p>
                 Álatala hozzáadva:
-                {{ slectedToilet.added_by ?? "OSM adatbázisból" }}
+                {{ selectedToilet.added_by ?? "OSM adatbázisból" }}
               </p>
-              <div *ngIf="slectedToilet.extra_info as extra_info">
+              <div *ngIf="selectedToilet.extra_info as extra_info">
                 <p>További adatok:</p>
                 <div *ngFor="let key of Keys(extra_info)">
                   <p>
@@ -267,7 +267,7 @@
                 <mat-card
                   (click)="getNewToiletDetails(toilet.toilet_id)"
                   [class.selected-card]="
-                    slectedToilet?.toilet_id === toilet.toilet_id
+                    selectedToilet?.toilet_id === toilet.toilet_id
                   "
                 >
                   <mat-card-content>
@@ -278,30 +278,30 @@
             </div>
           </mat-card>
         </div>
-        <div class="panel-details" *ngIf="slectedToilet !== null">
+        <div class="panel-details" *ngIf="selectedToilet !== null">
           <mat-card>
             <h2>Mosdó adatai</h2>
             <mat-card-content class="card-detail">
-              <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
-              <p>Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}</p>
-              <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
-              <p>Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}</p>
-              <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+              <p>Név: {{ selectedToilet.name || "Nincs megadva" }}</p>
+              <p>Toilet ID: {{ selectedToilet.toilet_id || "Nincs megadva" }}</p>
+              <p>OSM ID: {{ selectedToilet.osm_id || "Nincs megadva" }}</p>
+              <p>Üzemeltető: {{ selectedToilet.operator || "Nincs megadva" }}</p>
+              <p>Hozzáférés: {{ selectedToilet.access || "Nincs megadva" }}</p>
               <p>
                 Nyitvatratás:
-                {{ slectedToilet.opening_hours || "Nincs megadva" }}
+                {{ selectedToilet.opening_hours || "Nincs megadva" }}
               </p>
-              <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
-              <p>Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}</p>
+              <p>Pozíció: {{ selectedToilet.lat }}, {{ selectedToilet.lon }}</p>
+              <p>Használati díj: {{ selectedToilet.fee || "Nincs megadva" }}</p>
               <p>
                 Mozgáskorlátozott:
-                {{ slectedToilet.wheelchair || "Nincs megadva" }}
+                {{ selectedToilet.wheelchair || "Nincs megadva" }}
               </p>
               <p>
                 Átala hozzáadva:
-                {{ slectedToilet.added_by ?? "OSM adatbázisból" }}
+                {{ selectedToilet.added_by ?? "OSM adatbázisból" }}
               </p>
-              <div *ngIf="slectedToilet.extra_info as extra_info">
+              <div *ngIf="selectedToilet.extra_info as extra_info">
                 <p>További adatok:</p>
                 <div *ngFor="let key of Keys(extra_info)">
                   <p>
@@ -312,7 +312,7 @@
               </div>
 
               <div class="field-button">
-                <button mat-button (click)="showOnMap(slectedToilet)">
+                <button mat-button (click)="showOnMap(selectedToilet)">
                   Megtekintés térképen
                 </button>
               </div>
@@ -320,13 +320,13 @@
               <div class="field-button">
                 <button
                   mat-button
-                  (click)="approveToilet(slectedToilet.toilet_id)"
+                  (click)="approveToilet(selectedToilet.toilet_id)"
                 >
                   Jóváhagyás
                 </button>
                 <button
                   mat-button
-                  (click)="rejectToilet(slectedToilet.toilet_id)"
+                  (click)="rejectToilet(selectedToilet.toilet_id)"
                 >
                   Elutasítás
                 </button>
@@ -381,43 +381,43 @@
               </mat-card-content>
             </mat-card>
           </div>
-          <div *ngIf="slectedToilet !== null">
+          <div *ngIf="selectedToilet !== null">
             <mat-card *ngIf="!modifyTrigger">
               <h2>Mosdó adatai</h2>
               <mat-card-content class="card-detail">
-                <p>Név: {{ slectedToilet.name || "Nincs megadva" }}</p>
+                <p>Név: {{ selectedToilet.name || "Nincs megadva" }}</p>
                 <p>
-                  Toilet ID: {{ slectedToilet.toilet_id || "Nincs megadva" }}
+                  Toilet ID: {{ selectedToilet.toilet_id || "Nincs megadva" }}
                 </p>
-                <p>OSM ID: {{ slectedToilet.osm_id || "Nincs megadva" }}</p>
+                <p>OSM ID: {{ selectedToilet.osm_id || "Nincs megadva" }}</p>
                 <p>
-                  Üzemeltető: {{ slectedToilet.operator || "Nincs megadva" }}
+                  Üzemeltető: {{ selectedToilet.operator || "Nincs megadva" }}
                 </p>
-                <p>Hozzáférés: {{ slectedToilet.access || "Nincs megadva" }}</p>
+                <p>Hozzáférés: {{ selectedToilet.access || "Nincs megadva" }}</p>
                 <p>
                   Nyitvatratás:
-                  {{ slectedToilet.opening_hours || "Nincs megadva" }}
+                  {{ selectedToilet.opening_hours || "Nincs megadva" }}
                 </p>
-                <p>Pozíció: {{ slectedToilet.lat }}, {{ slectedToilet.lon }}</p>
+                <p>Pozíció: {{ selectedToilet.lat }}, {{ selectedToilet.lon }}</p>
                 <p>
-                  Használati díj: {{ slectedToilet.fee || "Nincs megadva" }}
+                  Használati díj: {{ selectedToilet.fee || "Nincs megadva" }}
                 </p>
                 <p>
                   Mozgáskorlátozott:
-                  {{ slectedToilet.wheelchair || "Nincs megadva" }}
+                  {{ selectedToilet.wheelchair || "Nincs megadva" }}
                 </p>
                 <p>
-                  Jóváhagyott: {{ slectedToilet.approved ? "Igen" : "Nem" }}
+                  Jóváhagyott: {{ selectedToilet.approved ? "Igen" : "Nem" }}
                 </p>
                 <p>
                   Általa jóváhagyott:
-                  {{ slectedToilet.approved_by || "OSM adatbázidból" }}
+                  {{ selectedToilet.approved_by || "OSM adatbázidból" }}
                 </p>
                 <p>
                   Átala hozzáadva:
-                  {{ slectedToilet.added_by || "OSM adatbázisból" }}
+                  {{ selectedToilet.added_by || "OSM adatbázisból" }}
                 </p>
-                <div *ngIf="slectedToilet.extra_info as extra_info">
+                <div *ngIf="selectedToilet.extra_info as extra_info">
                   <p>További adatok:</p>
                   <div *ngFor="let key of Keys(extra_info)">
                     <p>
