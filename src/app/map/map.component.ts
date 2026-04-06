@@ -14,21 +14,39 @@ import { AsyncPipe, NgIf } from '@angular/common';
 import { AddToiletComponent } from '../components/add-toilet/add-toilet.component';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { RouteService } from '../services/route.service';
+import { MarkerManagerService } from '../services/marker-manager.service';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet-gpx';
-import GPX from 'leaflet-gpx';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
+const MARKER_SIZE: L.PointExpression = [60, 60];
+const MARKER_ANCHOR: L.PointExpression = [30, 60];
+const POPUP_ANCHOR: L.PointExpression = [0, -60];
+const CLUSTER_SIZE: L.PointExpression = [30, 30];
+const CLUSTER_ANCHOR: L.PointExpression = [15, 15];
+
+const BUDAPEST_CENTER: L.LatLngExpression = [47.4979, 19.0402];
+const DEFAULT_ZOOM = 8.4;
+const INIT_MIN_ZOOM = 8;
+const MIN_ZOOM = 15;
+
+const ICONS = {
+  toilet: 'assets/toilet_marker.png',
+  toiletNew: 'assets/toilet_marker_new.png',
+  currentPosition: 'assets/currentPosition.png',
+} as const;
+
 L.Icon.Default.mergeOptions({
-  iconUrl: 'assets/toilet_marker.png',
-  iconRetinaUrl: 'assets/toilet_marker.png',
+  iconUrl: ICONS.toilet,
+  iconRetinaUrl: ICONS.toilet,
   shadowUrl: null,
-  iconSize: [60, 60],
-  iconAnchor: [30, 60],
-  popupAnchor: [0, -60],
+  iconSize: MARKER_SIZE,
+  iconAnchor: MARKER_ANCHOR,
+  popupAnchor: POPUP_ANCHOR,
 });
 
 @Component({
@@ -53,28 +71,18 @@ export class MapComponent implements AfterViewInit {
   selectedToilet: Toilet | null = null;
 
   private userMarker!: L.Marker;
-  private routeLayer!: any;
   private adminPreviewMarker: L.Marker | null = null;
 
   private selectedToiletLatLng!: L.LatLng;
   private startRouteLatLng: L.LatLng | null = null;
 
-  private lastGpxText: string | null = null;
-
   private currentPosMarker!: L.Marker;
 
-  private readonly MIN_ZOOM = 15;
   private prevZoom: number | null = null;
-
-  transportProfile: string = '';
 
   addToiletMode: boolean = false;
   addToiletLatLng: L.LatLng | null = null;
   isPickingPosition: boolean = false;
-
-  distance: number | null = null;
-  time: number | null = null;
-  calcRoute: boolean = false;
 
   showBackToAdminButton = false;
   isAdminPreviewMode = false;
@@ -87,67 +95,46 @@ export class MapComponent implements AfterViewInit {
     private mapAction: MapActionService,
     public auth: AuthService,
     private router: Router,
+    private routeService: RouteService,
+    private markerManager: MarkerManagerService,
   ) {}
 
+  get distance() {
+    return this.routeService.distance;
+  }
+  get time() {
+    return this.routeService.time;
+  }
+  get calcRoute() {
+    return this.routeService.calcRoute;
+  }
+  get transportProfile() {
+    return this.routeService.transportProfile;
+  }
+
   onTransportModeChange(mode: string) {
-    this.transportProfile = mode;
+    this.routeService.transportProfile = mode;
 
     if (this.startRouteLatLng && this.selectedToilet) {
-      this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
+      this.routeService.calculateRoute(
+        this.map,
+        this.startRouteLatLng,
+        this.selectedToiletLatLng,
+      );
     }
   }
 
   ngAfterViewInit(): void {
     this.initMap();
 
-    const markers = L.markerClusterGroup({
-      iconCreateFunction: function (cluster) {
-        const count = cluster.getChildCount();
-        return L.divIcon({
-          html: `
-                <div class="custom-cluster-icon">
-                  <div class="custom-cluster-count">
-                    ${count}
-                  </div>
-                </div>
-              `,
-          className: '',
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
-        });
+    this.markerManager.loadToiletMarkers(
+      this.map,
+      (toilet) => {
+        this.selectedToilet = toilet;
+        console.log('Részletes WC adatok:', toilet);
       },
-    });
-
-    this.api.getToilets().subscribe({
-      next: (toilets) => {
-        const toiletIcon = L.icon({
-          iconUrl: 'assets/toilet_marker.png',
-          iconSize: [60, 60],
-        });
-
-        toilets.forEach((t: ToiletList) => {
-          if (t.lat && t.lon) {
-            const marker = L.marker([t.lat, t.lon], { icon: toiletIcon });
-
-            marker.on('click', () => {
-              if (this.isAdminPreviewMode) return;
-              this.api.getToiletsById(t.toilet_id).subscribe({
-                next: (fullToilet) => {
-                  this.selectedToilet = fullToilet;
-                  console.log('Részletes WC adatok:', fullToilet);
-                },
-                error: (err) => console.error(err),
-              });
-            });
-
-            markers.addLayer(marker);
-          }
-        });
-
-        this.map.addLayer(markers);
-      },
-      error: (err) => console.error(err),
-    });
+      () => this.isAdminPreviewMode,
+    );
 
     this.mapAction.selectNearestToilet$.subscribe(() => {
       this.getNearestToilet();
@@ -181,21 +168,7 @@ export class MapComponent implements AfterViewInit {
         });
         this.selectedToiletLatLng = L.latLng(lat, lon);
 
-        if (this.adminPreviewMarker) {
-          this.map.removeLayer(this.adminPreviewMarker);
-        }
-
-        const previewIcon = L.icon({
-          iconUrl: 'assets/toilet_marker_new.png',
-          iconSize: [60, 60],
-          iconAnchor: [30, 60],
-          popupAnchor: [0, -60],
-        });
-
-        this.adminPreviewMarker = L.marker(pos, {
-          icon: previewIcon,
-          zIndexOffset: 1000,
-        }).addTo(this.map);
+        this.markerManager.showAdminPreview(this.map, pos);
 
         requestAnimationFrame(() => {
           this.map.invalidateSize(true);
@@ -206,12 +179,10 @@ export class MapComponent implements AfterViewInit {
   }
 
   private initMap(): void {
-    const currentPos = this.locationService.getCurrentLocation();
-
     this.map = L.map('map', {
-      center: [47.4979, 19.0402], //Budapest koordinátái
-      zoom: 8.4,
-      minZoom: 8,
+      center: BUDAPEST_CENTER,
+      zoom: DEFAULT_ZOOM,
+      minZoom: INIT_MIN_ZOOM,
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -235,79 +206,27 @@ export class MapComponent implements AfterViewInit {
       this.startRouteLatLng = e.latlng;
 
       this.userMarker = L.marker(e.latlng, { draggable: true }).addTo(this.map);
-      this.calculateRoute(e.latlng, this.selectedToiletLatLng);
+      this.routeService.calculateRoute(
+        this.map,
+        e.latlng,
+        this.selectedToiletLatLng,
+      );
 
       this.userMarker.on('dragend', (event: L.LeafletEvent) => {
         const marker = event.target as L.Marker;
         const newPosition = marker.getLatLng();
         this.startRouteLatLng = newPosition;
-        this.calculateRoute(this.startRouteLatLng, this.selectedToiletLatLng);
+        this.routeService.calculateRoute(
+          this.map,
+          this.startRouteLatLng,
+          this.selectedToiletLatLng,
+        );
       });
 
       this.map.off('click', clickHandler);
     };
 
     this.map.on('click', clickHandler);
-  }
-
-  calculateRoute(start: L.LatLng, end: L.LatLng) {
-    if (this.isAdminPreviewMode) return;
-    this.api.getRoute(start, end, this.transportProfile).subscribe({
-      next: (gpxText: string) => {
-        console.log('gpx', gpxText);
-
-        this.calcRoute = true;
-
-        const stats = this.extractStats(gpxText);
-
-        this.distance = stats.distanceKm ?? 0;
-        this.time = stats.durationMin ?? 0;
-
-        this.lastGpxText = gpxText;
-
-        const startIcon = L.icon({
-          iconUrl: 'assets/toilet_marker_start.png',
-          iconSize: [60, 60],
-          iconAnchor: [30, 60],
-        });
-        const endIcon = L.icon({
-          iconUrl: 'assets/toilet_marker_end.png',
-          iconSize: [60, 60],
-          iconAnchor: [30, 60],
-        });
-
-        // @ts-ignore
-        const newRouteLayer = new L.GPX(gpxText, {
-          async: true,
-          markers: {
-            startIcon: startIcon,
-            endIcon: endIcon,
-            wptIcons: {},
-          },
-          polyline_options: {
-            color: 'darkblue',
-            weight: 6,
-          },
-        })
-          .on('loaded', (e: any) => {
-            if (this.routeLayer) {
-              this.map.removeLayer(this.routeLayer);
-            }
-            this.routeLayer = newRouteLayer;
-            this.map.fitBounds(e.target.getBounds());
-          })
-          .on('addpoint', (e: any) => {
-            if (e.point_type === 'end' && e.marker) {
-              this.map.removeLayer(e.marker);
-            }
-          })
-          .addTo(this.map);
-      },
-      error: (err) => {
-        console.error('Route fetch error', err);
-        this.calcRoute = false;
-      },
-    });
   }
 
   googleRoute() {
@@ -317,52 +236,16 @@ export class MapComponent implements AfterViewInit {
       return;
     }
 
-    var startLat = this.userMarker.getLatLng().lat;
-    var startLng = this.userMarker.getLatLng().lng;
-
-    var endLat = this.selectedToiletLatLng.lat;
-    var endLng = this.selectedToiletLatLng.lng;
-
-    var travelMode = '';
-
-    switch (this.transportProfile) {
-      case 'shortest':
-        travelMode = 'walking';
-        break;
-      case 'mtb':
-        travelMode = 'bicycling';
-        break;
-      case 'car-vario':
-        travelMode = 'driving';
-        break;
-      default:
-        break;
-    }
-
-    const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${endLat},${endLng}&travelmode=${travelMode}`;
-
-    window.open(googleUrl, '_blank');
+    this.routeService.openGoogleRoute(
+      this.userMarker.getLatLng(),
+      this.selectedToiletLatLng,
+    );
   }
 
   downloadGpx() {
     if (this.isAdminPreviewMode) return;
-    if (!this.lastGpxText) {
-      alert('Nincs letölthető útvonal!');
-      return;
-    }
 
-    const blob = new Blob([this.lastGpxText], {
-      type: 'application/gpx+xml;charset=utf-8',
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'utvonal.gpx';
-    a.click();
-
-    window.URL.revokeObjectURL(url);
+    this.routeService.downloadGpx();
   }
 
   async startRouteFromCurrentLocation() {
@@ -387,14 +270,18 @@ export class MapComponent implements AfterViewInit {
 
       this.userMarker = L.marker(startLatLng, {
         icon: L.icon({
-          iconUrl: 'assets/currentPosition.png',
-          iconSize: [60, 60],
+          iconUrl: ICONS.currentPosition,
+          iconSize: MARKER_SIZE,
         }),
       }).addTo(this.map);
 
       this.startRouteLatLng = startLatLng;
 
-      this.calculateRoute(startLatLng, this.selectedToiletLatLng);
+      this.routeService.calculateRoute(
+        this.map,
+        startLatLng,
+        this.selectedToiletLatLng,
+      );
     } catch (err) {
       console.log('Position error', err);
     }
@@ -410,13 +297,7 @@ export class MapComponent implements AfterViewInit {
         this.map.removeLayer(this.currentPosMarker);
       }
 
-      this.currentPosMarker = L.marker(latlng, {
-        icon: L.icon({
-          iconUrl: 'assets/currentPosition.png',
-          iconSize: [60, 60],
-        }),
-        zIndexOffset: 2000
-      }).addTo(this.map);
+      this.markerManager.showCurrentPosition(this.map, latlng);
     } catch (err) {
       console.log('Position error', err);
     }
@@ -488,34 +369,6 @@ export class MapComponent implements AfterViewInit {
     this.cancelAdding();
   }
 
-  private extractStats(gpx: string): {
-    distanceKm?: number;
-    durationMin?: number;
-  } {
-    const commentMatch = gpx.match(/<!--([\s\S]*?)-->/);
-    if (!commentMatch) return {};
-
-    const comment = commentMatch[1];
-
-    const distanceMatch = comment.match(/track-length\s*=\s*([0-9]+)/i);
-    const distanceKm = distanceMatch
-      ? Number(distanceMatch[1]) / 1000
-      : undefined;
-
-    const timeMatch = comment.match(
-      /time\s*=\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?/i,
-    );
-    let durationMin: number | undefined;
-    if (timeMatch) {
-      const h = Number(timeMatch[1] ?? 0);
-      const m = Number(timeMatch[2] ?? 0);
-      const s = Number(timeMatch[3] ?? 0);
-      durationMin = h * 60 + m + s / 60;
-    }
-
-    return { distanceKm, durationMin };
-  }
-
   openMap() {
     const googleUrl = `https://www.google.com/maps/search/?api=1&query=${this.selectedToilet?.lat}%2C${this.selectedToilet?.lon}`;
 
@@ -525,11 +378,11 @@ export class MapComponent implements AfterViewInit {
   private lockZoomForPicking() {
     this.prevZoom = this.map.getMinZoom();
 
-    if (this.map.getZoom() < this.MIN_ZOOM) {
-      this.map.setZoom(this.MIN_ZOOM);
+    if (this.map.getZoom() < MIN_ZOOM) {
+      this.map.setZoom(MIN_ZOOM);
     }
 
-    this.map.setMinZoom(this.MIN_ZOOM);
+    this.map.setMinZoom(MIN_ZOOM);
   }
 
   private unlockZoom() {
@@ -572,20 +425,15 @@ export class MapComponent implements AfterViewInit {
   backToAdmin() {
     this.showBackToAdminButton = false;
 
-    if (this.adminPreviewMarker) {
-      (this.map.removeLayer(this.adminPreviewMarker),
-        {
-          state: {
-            selectedToiletId: this.selectedToilet?.toilet_id,
-          },
-        });
-      this.adminPreviewMarker = null;
-    }
+    this.markerManager.removeAdminPreview(this.map);
 
     this.isAdminPreviewMode = false;
 
     this.router.navigate(['/admin'], {
       queryParamsHandling: 'preserve',
+      state: {
+        selectedToiletId: this.selectedToilet?.toilet_id,
+      },
     });
   }
 
