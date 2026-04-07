@@ -1,9 +1,8 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { ToiletPanelComponent } from '../components/toilet-panel/toilet-panel.component';
 import { LocationService } from '../services/location.service';
 import { MapActionService } from '../services/map-action.service';
-import { ToiletList } from '../models/toilet-list';
 import { Toilet } from '../models/toilet';
 import { ToiletNearest } from '../models/toilet-nearest';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,8 +25,6 @@ delete (L.Icon.Default.prototype as any)._getIconUrl;
 const MARKER_SIZE: L.PointExpression = [60, 60];
 const MARKER_ANCHOR: L.PointExpression = [30, 60];
 const POPUP_ANCHOR: L.PointExpression = [0, -60];
-const CLUSTER_SIZE: L.PointExpression = [30, 30];
-const CLUSTER_ANCHOR: L.PointExpression = [15, 15];
 
 const BUDAPEST_CENTER: L.LatLngExpression = [47.4979, 19.0402];
 const DEFAULT_ZOOM = 8.4;
@@ -65,13 +62,12 @@ L.Icon.Default.mergeOptions({
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   private map!: L.Map;
 
   selectedToilet: Toilet | null = null;
 
   private userMarker!: L.Marker;
-  private adminPreviewMarker: L.Marker | null = null;
 
   private selectedToiletLatLng!: L.LatLng;
   private startRouteLatLng: L.LatLng | null = null;
@@ -136,15 +132,19 @@ export class MapComponent implements AfterViewInit {
       () => this.isAdminPreviewMode,
     );
 
-    this.mapAction.selectNearestToilet$.subscribe(() => {
-      this.getNearestToilet();
-    });
+    this.mapAction.selectNearestToilet$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.getNearestToilet();
+      });
 
     this.currentPosition();
 
-    this.mapAction.jumpTo$.subscribe(({ lat, lon, zoom }) => {
-      this.map.setView([lat, lon], zoom);
-    });
+    this.mapAction.jumpTo$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ lat, lon, zoom }) => {
+        this.map.setView([lat, lon], zoom);
+      });
 
     this.mapAction.adminPreviewToilet$
       .pipe(takeUntil(this.destroy$))
