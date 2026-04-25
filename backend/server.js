@@ -15,15 +15,22 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use("/auth", authRoutes);
 
-app.get("/users", async (req, res) => {
-  const result = await pool.query(`SELECT * FROM users`);
+app.get(
+  "/users",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
 
-  try {
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Database error:", err);
-  }
-});
+    try {
+      const result = await pool.query(`SELECT * FROM users`);
+      res.json(result.rows);
+    } catch (err) {
+      console.error("Database error:", err);
+    }
+  },
+);
 
 app.get("/toilets", async (req, res) => {
   const result = await pool.query(`SELECT 
@@ -92,11 +99,18 @@ app.post("/route", async (req, res) => {
   }
 });
 
-app.get("/profil/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query(
-      `
+app.get(
+  "/profil/:id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        `
             SELECT 
             user_id,
             google_id,
@@ -107,18 +121,19 @@ app.get("/profil/:id", async (req, res) => {
             FROM users
             WHERE user_id = $1;
             `,
-      [id],
-    );
+        [id],
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      res.status(500).json({ error: "Database error" });
     }
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: "Database error" });
-  }
-});
+  },
+);
 
 app.get("/rating/:toilet_id", async (req, res) => {
   const { toilet_id } = req.params;
@@ -521,9 +536,15 @@ app.post(
   },
 );
 
-app.get("/newToilet", async (req, res) => {
-  try {
-    const result = await pool.query(`SELECT 
+app.get(
+  "/newToilet",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    try {
+      const result = await pool.query(`SELECT 
         toilet_id,
         osm_id,     
         ST_X(location::geometry) AS lon,    
@@ -531,18 +552,25 @@ app.get("/newToilet", async (req, res) => {
       FROM toilets
       WHERE osm_id IS NULL AND approved = false;`);
 
-    res.json(result.rows);
-  } catch (err) {
-    console.error("DB error", err);
-    res.status(500).send("Database error");
-  }
-});
+      res.json(result.rows);
+    } catch (err) {
+      console.error("DB error", err);
+      res.status(500).send("Database error");
+    }
+  },
+);
 
-app.get("/newToilets/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query(
-      `
+app.get(
+  "/newToilets/:id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        `
         SELECT
         toilet_id,
         osm_id, 
@@ -559,19 +587,20 @@ app.get("/newToilets/:id", async (req, res) => {
       FROM toilets
       WHERE toilet_id = $1;
         `,
-      [id],
-    );
+        [id],
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Toilet not found" });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Toilet not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("DB error", err);
+      res.status(500).send("Database error");
     }
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("DB error", err);
-    res.status(500).send("Database error");
-  }
-});
+  },
+);
 
 app.put(
   "/toilet/:toilet_id/approve",
@@ -632,9 +661,15 @@ app.post(
   },
 );
 
-app.get("/suggestions", async (req, res) => {
-  try {
-    const result = await pool.query(`SELECT 
+app.get(
+  "/suggestions",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    try {
+      const result = await pool.query(`SELECT 
         toilet_id,
         user_id,     
         suggestion_id,
@@ -645,12 +680,13 @@ app.get("/suggestions", async (req, res) => {
       WHERE status = 'pending';
       `);
 
-    res.json(result.rows);
-  } catch (err) {
-    console.error("DB error", err);
-    res.status(500).send("Database error");
-  }
-});
+      res.json(result.rows);
+    } catch (err) {
+      console.error("DB error", err);
+      res.status(500).send("Database error");
+    }
+  },
+);
 
 app.patch(
   "/toiletsUpdate/:id",
