@@ -33,19 +33,38 @@ app.get(
 );
 
 app.get("/toilets", async (req, res) => {
-  const result = await pool.query(`SELECT 
-        toilet_id,
-        osm_id,     
-        ST_X(location::geometry) AS lon,    
-        ST_Y(location::geometry) AS lat
-      FROM toilets
-      WHERE osm_id IS NOT NULL OR approved = true;`);
+  const { fee, wheelchair } = req.query;
+
+  const conditions = ["(osm_id IS NOT NULL OR approved = true)"];
+  const params = [];
+
+  if (fee !== undefined) {
+    params.push(fee === "true");
+    conditions.push(`fee = $${params.length}`);
+  }
+
+  if (wheelchair !== undefined) {
+    params.push(wheelchair === "true");
+    conditions.push(`wheelchair = $${params.length}`);
+  }
 
   try {
+    const result = await pool.query(
+      `SELECT
+        toilet_id,
+        osm_id,
+        fee,
+        wheelchair,
+        ST_X(location::geometry) AS lon,
+        ST_Y(location::geometry) AS lat
+      FROM toilets
+      WHERE ${conditions.join(" AND ")}`,
+      params
+    );
     res.json(result.rows);
   } catch (err) {
     console.error("DB error", err);
-    res.status(500).send("DAtabase error");
+    res.status(500).send("Database error");
   }
 });
 

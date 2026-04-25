@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteService } from '../services/route.service';
 import { MarkerManagerService } from '../services/marker-manager.service';
+import { ToiletFilterComponent } from '../components/toilet-filter/toilet-filter.component';
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -57,6 +58,7 @@ L.Icon.Default.mergeOptions({
     NgIf,
     AsyncPipe,
     AddToiletComponent,
+    ToiletFilterComponent
   ],
   providers: [ApiService],
   templateUrl: './map.component.html',
@@ -73,6 +75,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private startRouteLatLng: L.LatLng | null = null;
 
   private currentPosMarker!: L.Marker;
+  private currentFilters: {fee?: boolean; wheelchair?: boolean} = {};
 
   private prevZoom: number | null = null;
 
@@ -436,6 +439,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       },
     });
   }
+
+  onFilterChange(filters: { fee?: boolean; wheelchair?: boolean }) {
+    this.currentFilters = filters;
+    this.markerManager.loadToiletMarkers(
+      this.map,
+      (toilet) => {
+        this.selectedToilet = toilet;
+      },
+      () => this.isAdminPreviewMode,
+      filters,
+    );
+  } 
 
   ngOnDestroy() {
     this.destroy$.next();

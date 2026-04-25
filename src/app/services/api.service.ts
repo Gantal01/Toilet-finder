@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { ToiletNearest } from '../models/toilet-nearest';
@@ -18,8 +18,15 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  getToilets(): Observable<ToiletList[]>{
-    return this.http.get<ToiletList[]>(`${environment.apiUrl}/toilets`);
+  getToilets(query?: { fee?: boolean, wheelchair?: boolean }): Observable<ToiletList[]>{
+    let params = new HttpParams();
+    if (query?.fee !== undefined) {
+      params = params.set('fee', String(query.fee));
+    }
+    if (query?.wheelchair !== undefined) {
+      params = params.set('wheelchair', String(query.wheelchair));
+    }
+    return this.http.get<ToiletList[]>(`${environment.apiUrl}/toilets`, { params });
   }
 
   getToiletsById(toilet_id: number): Observable<Toilet>{

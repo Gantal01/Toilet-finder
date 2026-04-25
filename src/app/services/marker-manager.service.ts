@@ -23,6 +23,7 @@ const ICONS = {
 export class MarkerManagerService {
   private currentPosMarker!: L.Marker;
   private adminPreviewMarker: L.Marker | null = null;
+  private toiletMarkers: L.MarkerClusterGroup | null = null;
 
   constructor(private api: ApiService) {}
 
@@ -30,7 +31,14 @@ export class MarkerManagerService {
     map: L.Map,
     onToiletClick: (toilet: Toilet) => void,
     isAdminPreview: () => boolean,
+    filters?: { fee?: boolean; wheelchair?: boolean },
   ) {
+
+    if (this.toiletMarkers) {
+      map.removeLayer(this.toiletMarkers);
+      this.toiletMarkers = null;
+    }
+
     const markers = L.markerClusterGroup({
       iconCreateFunction: function (cluster) {
         const count = cluster.getChildCount();
@@ -55,7 +63,7 @@ export class MarkerManagerService {
       iconAnchor: MARKER_ANCHOR,
     });
 
-    this.api.getToilets().subscribe({
+    this.api.getToilets(filters).subscribe({
       next: (toilets) => {
         toilets.forEach((t: ToiletList) => {
           if (t.lat && t.lon) {
@@ -73,6 +81,7 @@ export class MarkerManagerService {
         });
 
         map.addLayer(markers);
+        this.toiletMarkers = markers;
       },
       error: (err) => console.error(err),
     });

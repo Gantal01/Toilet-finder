@@ -3,4 +3,6 @@ export interface ToiletList {
   osm_id: number;
   lat: number;
   lon: number;
+  fee: boolean | null;
+  wheelchair: boolean | null;
 }

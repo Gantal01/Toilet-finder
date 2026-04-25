@@ -1,0 +1,35 @@
+<button
+    mat-fab
+    color="white"
+    class="filter-fab"
+    (click)="togglePanel()"
+    matTooltip="Szűrők"
+  >
+    <mat-icon>filter_list</mat-icon>
+  </button>
+
+  <div class="filter-panel" *ngIf="panelOpen">
+    <div class="filter-header">
+      <h3>Szűrők</h3>
+      <button mat-icon-button (click)="togglePanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="filter-options">
+      <mat-checkbox [(ngModel)]="freeOnly" (change)="onFilterChange()">
+        Csak ingyenes
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="wheelchairOnly" (change)="onFilterChange()">
+        Csak akadálymentes
+      </mat-checkbox>
+    </div>
+
+    <button
+      mat-stroked-button
+      class="reset-btn"
+      (click)="resetFilters()"
+    >
+      Szűrők törlése
+    </button>
+  </div>
