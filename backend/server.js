@@ -4,7 +4,6 @@ const pool = require("./db");
 const fetch = require("node-fetch");
 const passport = require("./passport");
 const authRoutes = require("./auth");
-const e = require("express");
 require("dotenv").config({ path: "secret.env" });
 
 const app = express();
@@ -109,7 +108,9 @@ app.post("/route", async (req, res) => {
   console.log("ROUTE BODY:", req.body);
 
   try {
-    const url = `http://localhost:17777/brouter?lonlats=${start.lng},${start.lat}|${end.lng},${end.lat}&format=gpx&profile=${profile}`;
+    const url = `http://localhost:17777/brouter?lonlats=` +
+    `${start.lng},${start.lat}|${end.lng},${end.lat}` +
+    `&format=gpx&profile=${profile}`;
     const response = await fetch(url);
     const gpxText = await response.text();
     res.send(gpxText);
@@ -317,10 +318,14 @@ app.get("/toilet/nearest", async (req, res) => {
       name,
       ST_X(location::geometry) AS lon,
       ST_Y(location::geometry) AS lat,
-      ST_DISTANCE(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
+      ST_DISTANCE(
+        location::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
       FROM toilets
       WHERE osm_id IS NOT NULL OR approved = true
-      ORDER BY ST_Distance(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)
+      ORDER BY ST_Distance(
+        location::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)
       LIMIT 1;
       `,
       [lon, lat],
@@ -384,8 +389,7 @@ app.delete(
         DELETE FROM ratings
         WHERE rating_id = $1
         AND (user_id = $2 OR $3 = 'admin')
-        RETURNING rating_id;
-      
+        RETURNING rating_id;      
       `,
         [ratingID, userID, isAdmin],
       );
@@ -569,7 +573,7 @@ app.get(
         ST_X(location::geometry) AS lon,    
         ST_Y(location::geometry) AS lat
       FROM toilets
-      WHERE osm_id IS NULL AND approved = false;`);
+      WHERE osm_id IS NULL AND approved = false AND approved_by IS NULL;`);
 
       res.json(result.rows);
     } catch (err) {

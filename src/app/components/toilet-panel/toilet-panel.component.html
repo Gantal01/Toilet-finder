@@ -20,6 +20,7 @@
   <p>Díj: {{ toilet.fee || "Nincs megadva" }}</p>
   <p>Üzemeltető: {{ toilet.operator || "Nincs megadva" }}</p>
   <p>Mozgáskorlátozott: {{ toilet.wheelchair || "Nincs megadva" }}</p>
+  <p>Hozzáférhetőség: {{ toilet.access || "Nincs megadva" }}</p>
   <p>Nyitvatartás: {{ toilet.opening_hours || "Nincs megadva" }}</p>
 
   <div *ngIf="toilet.extra_info as extra_info">
