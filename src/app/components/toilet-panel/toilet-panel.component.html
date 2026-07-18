@@ -17,9 +17,9 @@
   </ng-container>
 
   <p>Név: {{ toilet.name || "Nincs megadva" }}</p>
-  <p>Díj: {{ toilet.fee || "Nincs megadva" }}</p>
+  <p>Díj: {{ toilet.fee ? "Igen" : "Nincs megadva" }}</p>
   <p>Üzemeltető: {{ toilet.operator || "Nincs megadva" }}</p>
-  <p>Mozgáskorlátozott: {{ toilet.wheelchair || "Nincs megadva" }}</p>
+  <p>Mozgáskorlátozott: {{ toilet.wheelchair ? "Igen" : "Nincs megadva" }}</p>
   <p>Hozzáférhetőség: {{ toilet.access || "Nincs megadva" }}</p>
   <p>Nyitvatartás: {{ toilet.opening_hours || "Nincs megadva" }}</p>
 
