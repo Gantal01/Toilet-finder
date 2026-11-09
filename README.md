@@ -1,3 +1,15 @@
+# Public Restroom Finder (Nyilvános illemhely kereső webalkalmazás)
+
+Web application for finding public restrooms in Hungary, built on
+OpenStreetMap data. Features: map browsing with Leaflet.js, filtering
+(free, wheelchair accessible), BRouter route planning, Nominatim address
+search, user reviews, correction suggestions with admin moderation, and
+Google OAuth login. Stack: Angular 17, Node.js/Express, PostgreSQL + PostGIS, JWT.
+
+*(Magyar leírás lent.)*
+
+---
+
 # Nyilvános illemhely kereső webalkalmazás
 
 Nyilvános mosdókat kereső webalkalmazás Magyarország területén.
